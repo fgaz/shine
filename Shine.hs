@@ -13,14 +13,16 @@ import GHCJS.DOM.HTMLCanvasElement (getContext)
 import GHCJS.DOM.CanvasRenderingContext2D
 import GHCJS.DOM.Enums (CanvasWindingRule (CanvasWindingRuleNonzero))
 import GHCJS.DOM.Document (getElementById)
-import GHCJS.DOM.Types (Window, IsCanvasStyle, CanvasStyle, toCanvasStyle)
+import GHCJS.DOM.Types (Window, CanvasStyle (..))
 
 import GHCJS.Prim (JSVal)
+import GHCJS.Marshal
 import Unsafe.Coerce (unsafeCoerce)
 import Data.Monoid ((<>))
 import Control.Concurrent (threadDelay)
+import Data.List (intercalate)
 
-data Color = Color Float Float Float Float
+data Color = Color Int Int Int Float
 
 data Picture = Empty
              | Rect Float Float Float Float
@@ -99,12 +101,17 @@ draw ctx (Colored col (Over a b)) = do
 draw ctx (Colored _ (Colored col a)) = do --the innermost color wins
     draw ctx $ Colored col a
 draw ctx (Colored (Color r g b a) x) = do
-    -- TODO none of this works ↓
-    --setStrokeColorRGB ctx r g b a
-    --setFillColorRGB ctx r g b a
-    --setFillStyle ctx (Just $  (unsafeCoerce "#ff0000" :: CanvasStyle))
+    let colorString = "rgba("
+                   ++ intercalate "," [show r, show g, show b, show a]
+                   ++ ")"
+    color <- toJSVal colorString
+    setFillStyle ctx $ Just $ CanvasStyle color
+    setStrokeStyle ctx $ Just $ CanvasStyle color
     draw ctx x
-    --setcolor black? --TODO
+    -- set the color back to black
+    black <- toJSVal "#000000"
+    setFillStyle ctx $ Just $ CanvasStyle black
+    setStrokeStyle ctx $ Just $ CanvasStyle black
 
 --TODO this probably needs to be a Picture since the rotation is handled by js.
 rotate :: Float -> Picture -> Picture
