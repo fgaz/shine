@@ -22,17 +22,31 @@ import Data.Monoid ((<>))
 import Control.Concurrent (threadDelay)
 import Data.List (intercalate)
 
+-- | A color given r, g, b (all from 0 to 255) and alpha (from 0 to 1)
 data Color = Color Int Int Int Float
 
-data Picture = Empty
+data Picture = Empty -- ^ The empty picture. Draws nothing.
+             -- | A rectangle from the coordinates of the upper-left point
+             -- and dimensions
              | Rect Float Float Float Float
+             -- | Same thing but filled
              | RectF Float Float Float Float
+             -- | A line from the coordinates of two points
              | Line Float Float Float Float
+             -- | An arc from the center coordinates, start angle, end angle.
+             -- If the last parameter is True, the direction is counterclockwise
+             -- TODO replace with Clockwise | Counterclockwise or remove entirely
              | Arc Float Float Float Float Float Bool
+             -- | A filled circle from the center coordinates and radius
              | CircleF Float Float Float
+             -- | Draws the second Picture over the First
              | Over Picture Picture
-             | Colored Color Picture --TODO
+             -- | Applies the color to the picture.
+             -- Innermost colors have the precedence, so you can set a "global
+             -- color" and override it
+             | Colored Color Picture
 
+-- | A circle from the center coordinates and radius
 circle :: Float -> Float -> Float -> Picture
 circle a b r = Arc a b r 0 (2*3.14) False
 
@@ -49,9 +63,12 @@ initCanvas webView x y = do
     ctx <- (getContext (unsafeCoerce c) "2d") :: IO (JSVal)
     return $ unsafeCoerce ctx --how do i get a 2dcontext properly? This works for now.
 
+-- | Draws a picture which depends only on the time
 animate :: (Int,Int) -> (Float -> Picture) -> IO ()
 animate xy f = animateIO xy $ const (return . f)
 
+-- | Draws a picture which depends only on the time... and everything else,
+-- since you can do I/O.
 animateIO :: (Int,Int) -> (CanvasRenderingContext2D -> Float -> IO Picture) -> IO ()
 animateIO (x,y) f = runWebGUI $ \ webView -> do
     ctx <- initCanvas webView x y
