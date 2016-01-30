@@ -25,30 +25,35 @@ import Data.List (intercalate)
 -- | A color given r, g, b (all from 0 to 255) and alpha (from 0 to 1)
 data Color = Color Int Int Int Float
 
+-- | A drawable element. All Pictures are centered.
 data Picture = Empty -- ^ The empty picture. Draws nothing.
-             -- | A rectangle from the coordinates of the upper-left point
-             -- and dimensions
-             | Rect Float Float Float Float
+             -- | A rectangle from the dimensions
+             | Rect Float Float
              -- | Same thing but filled
-             | RectF Float Float Float Float
+             | RectF Float Float
              -- | A line from the coordinates of two points
              | Line Float Float Float Float
-             -- | An arc from the center coordinates, start angle, end angle.
+             -- | An arc from the radius, start angle, end angle.
              -- If the last parameter is True, the direction is counterclockwise
              -- TODO replace with Clockwise | Counterclockwise or remove entirely
-             | Arc Float Float Float Float Float Bool
-             -- | A filled circle from the center coordinates and radius
-             | CircleF Float Float Float
+             | Arc Float Float Float Bool
+             -- | A filled circle from the radius
+             | CircleF Float
              -- | Draws the second Picture over the First
              | Over Picture Picture
              -- | Applies the color to the picture.
              -- Innermost colors have the precedence, so you can set a "global
              -- color" and override it
              | Colored Color Picture
+             -- | Rotates the Picture (in radians)
+             | Rotate Float Picture
+             -- | Moves the Picture by the given x and y distances
+             | Translate Float Float Picture
+             -- TODO stroke
 
 -- | A circle from the center coordinates and radius
-circle :: Float -> Float -> Float -> Picture
-circle a b r = Arc a b r 0 (2*3.14) False
+circle :: Float -> Picture
+circle r = Arc r 0 (2*3.14) False
 
 instance Monoid Picture where
     mempty = Empty
@@ -74,6 +79,7 @@ animateIO (x,y) f = runWebGUI $ \ webView -> do
     ctx <- initCanvas webView x y
     let loop t = do
         clearRect ctx 0 0 (fromIntegral x) (fromIntegral y)
+        setTransform ctx 1 0 0 1 0 0 -- reset transforms (and accumulated errors!).
         pic <- f ctx t
         draw ctx pic
         threadDelay 30000 --TODO FPS capping
@@ -95,19 +101,19 @@ draw ctx (Line a b c d) = do
     moveTo ctx a b
     lineTo ctx c d
     stroke ctx
-draw ctx (Rect a b c d) = do
-    rect ctx a b c d
+draw ctx (Rect c d) = do
+    rect ctx (-c/2) (-d/2) c d
     stroke ctx
-draw ctx (RectF a b c d) = fillRect ctx a b c d
-draw ctx (Arc a b c d e f) = do
+draw ctx (RectF c d) = fillRect ctx (-c/2) (-d/2) c d
+draw ctx (Arc c d e f) = do
     beginPath ctx
-    arc ctx a b c d e f
+    arc ctx 0 0 c d e f
     stroke ctx
-draw ctx (CircleF x y r) = do
+draw ctx (CircleF r) = do
     save ctx
-    draw ctx (circle x y r)
+    draw ctx (circle r)
     clip ctx CanvasWindingRuleNonzero
-    draw ctx (RectF (x-r) (y-r) (r*2) (r*2))
+    draw ctx (RectF (r*2) (r*2))
     restore ctx
 draw ctx (Over a b) = do
     draw ctx a
@@ -129,11 +135,12 @@ draw ctx (Colored (Color r g b a) x) = do
     black <- toJSVal "#000000"
     setFillStyle ctx $ Just $ CanvasStyle black
     setStrokeStyle ctx $ Just $ CanvasStyle black
-
---TODO this probably needs to be a Picture since the rotation is handled by js.
-rotate :: Float -> Picture -> Picture
-rotate angle _ = undefined
-
---TODO this can be a function
-move :: Float -> Float -> Picture -> Picture
-move x y _ = undefined
+draw ctx (Rotate angle pic) = do
+    rotate ctx angle
+    draw ctx pic
+    --setTransform ctx 1 0 0 1 0 0 --not ok: prevents Rotate composition
+    rotate ctx (-angle)
+draw ctx (Translate a b pic) = do
+    translate ctx a b
+    draw ctx pic
+    translate ctx (-a) (-b)
