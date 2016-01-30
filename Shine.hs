@@ -7,12 +7,11 @@ module Shine (
 ) where
 
 import GHCJS.DOM (webViewGetDomDocument, runWebGUI)
-import GHCJS.DOM.Document (getBody)
+import GHCJS.DOM.Document (getBody, getElementById)
 import GHCJS.DOM.Element (setInnerHTML)
 import GHCJS.DOM.HTMLCanvasElement (getContext)
 import GHCJS.DOM.CanvasRenderingContext2D
 import GHCJS.DOM.Enums (CanvasWindingRule (CanvasWindingRuleNonzero))
-import GHCJS.DOM.Document (getElementById)
 import GHCJS.DOM.Types (Window, CanvasStyle (..))
 
 import GHCJS.Prim (JSVal)
@@ -65,7 +64,7 @@ initCanvas webView x y = do
     Just body <- getBody doc
     setInnerHTML body (Just $ canvasHtml x y)
     Just c <- getElementById doc "canvas"
-    ctx <- (getContext (unsafeCoerce c) "2d") :: IO (JSVal)
+    ctx <- getContext (unsafeCoerce c) "2d" :: IO JSVal
     return $ unsafeCoerce ctx --how do i get a 2dcontext properly? This works for now.
 
 -- | Draws a picture which depends only on the time
@@ -97,23 +96,23 @@ canvasHtml x y = "<canvas id=\"canvas\" \
 
 draw :: CanvasRenderingContext2D -> Picture -> IO ()
 draw _ Empty = return ()
-draw ctx (Line a b c d) = do
-    moveTo ctx a b
-    lineTo ctx c d
+draw ctx (Line x y x' y') = do
+    moveTo ctx x y
+    lineTo ctx x' y'
     stroke ctx
-draw ctx (Rect c d) = do
-    rect ctx (-c/2) (-d/2) c d
+draw ctx (Rect x y) = do
+    rect ctx (-x/2) (-y/2) x y
     stroke ctx
-draw ctx (RectF c d) = fillRect ctx (-c/2) (-d/2) c d
-draw ctx (Arc c d e f) = do
+draw ctx (RectF x y) = fillRect ctx (-x/2) (-y/2) x y
+draw ctx (Arc r a b direction) = do
     beginPath ctx
-    arc ctx 0 0 c d e f
+    arc ctx 0 0 r a b direction
     stroke ctx
 draw ctx (CircleF r) = do
     save ctx
-    draw ctx (circle r)
+    draw ctx $ circle r
     clip ctx CanvasWindingRuleNonzero
-    draw ctx (RectF (r*2) (r*2))
+    draw ctx $ RectF (r*2) (r*2)
     restore ctx
 draw ctx (Over a b) = do
     draw ctx a
@@ -121,16 +120,16 @@ draw ctx (Over a b) = do
 draw ctx (Colored col (Over a b)) = do
     draw ctx $ Colored col a
     draw ctx $ Colored col b
-draw ctx (Colored _ (Colored col a)) = do --the innermost color wins
-    draw ctx $ Colored col a
-draw ctx (Colored (Color r g b a) x) = do
+draw ctx (Colored _ (Colored col pic)) =
+    draw ctx $ Colored col pic --the innermost color wins
+draw ctx (Colored (Color r g b a) pic) = do
     let colorString = "rgba("
                    ++ intercalate "," [show r, show g, show b, show a]
                    ++ ")"
     color <- toJSVal colorString
     setFillStyle ctx $ Just $ CanvasStyle color
     setStrokeStyle ctx $ Just $ CanvasStyle color
-    draw ctx x
+    draw ctx pic
     -- set the color back to black
     black <- toJSVal "#000000"
     setFillStyle ctx $ Just $ CanvasStyle black
@@ -140,7 +139,7 @@ draw ctx (Rotate angle pic) = do
     draw ctx pic
     --setTransform ctx 1 0 0 1 0 0 --not ok: prevents Rotate composition
     rotate ctx (-angle)
-draw ctx (Translate a b pic) = do
-    translate ctx a b
+draw ctx (Translate x y pic) = do
+    translate ctx x y
     draw ctx pic
-    translate ctx (-a) (-b)
+    translate ctx (-x) (-y)
