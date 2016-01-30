@@ -19,6 +19,8 @@ import GHCJS.Marshal
 import Unsafe.Coerce (unsafeCoerce)
 import Data.Monoid ((<>))
 import Control.Concurrent (threadDelay)
+import Control.Monad (when)
+import Data.Time.Clock (getCurrentTime, diffUTCTime)
 import Data.List (intercalate)
 
 -- | A color given r, g, b (all from 0 to 255) and alpha (from 0 to 1)
@@ -68,21 +70,31 @@ initCanvas webView x y = do
     return $ unsafeCoerce ctx --how do i get a 2dcontext properly? This works for now.
 
 -- | Draws a picture which depends only on the time
-animate :: (Int,Int) -> (Float -> Picture) -> IO ()
-animate xy f = animateIO xy $ const (return . f)
+animate :: Float -- ^ FPS
+        -> (Int,Int) -- ^ Canvas dimensions
+        -> (Float -> Picture) -- ^ Your drawing function
+        -> IO ()
+animate fps xy f = animateIO fps xy $ const (return . f)
 
 -- | Draws a picture which depends only on the time... and everything else,
 -- since you can do I/O.
-animateIO :: (Int,Int) -> (CanvasRenderingContext2D -> Float -> IO Picture) -> IO ()
-animateIO (x,y) f = runWebGUI $ \ webView -> do
+animateIO :: Float -- ^ FPS
+          -> (Int,Int) -- ^ Canvas dimensions
+          -> (CanvasRenderingContext2D -> Float -> IO Picture) -- ^ Your drawing function
+          -> IO ()
+animateIO fps (x,y) f = runWebGUI $ \ webView -> do
     ctx <- initCanvas webView x y
     let loop t = do
+        stamp <- getCurrentTime
         clearRect ctx 0 0 (fromIntegral x) (fromIntegral y)
         setTransform ctx 1 0 0 1 0 0 -- reset transforms (and accumulated errors!).
         pic <- f ctx t
         draw ctx pic
-        threadDelay 30000 --TODO FPS capping
-        loop (t+100) --TODO add the time delta
+        now <- getCurrentTime
+        let td = diffUTCTime now stamp
+        when (realToFrac td <= 1 / fps) $
+          threadDelay $ floor $ (*1000000) (1 / fps - realToFrac td)
+        loop (t + 1/fps) --MAYBE change to currentTime - startTime
       in
         loop 0
 
