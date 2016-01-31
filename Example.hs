@@ -1,4 +1,5 @@
 import Shine
+import Shine.Input
 
 myPic :: Float -> Picture
 myPic x = Translate (75+x'/2) 15 (RectF (150+x') 30)
@@ -13,5 +14,19 @@ myPic x = Translate (75+x'/2) 15 (RectF (150+x') 30)
        <> Translate 350 350 (Rotate (x'/200) $ RectF 150 30)
     where x' = sin (x*3) *100 +100
 
+myAnimation :: IO ()
+myAnimation = animate 30 (800,600) myPic
+
+myGame :: IO ()
+myGame = play 30 (800,600) initialState draw handleInput step
+  where
+    initialState = False
+    draw False = Empty
+    draw True = RectF 300 300
+    handleInput _ (MouseButton LeftBtn Down _) = True
+    handleInput _ (MouseButton LeftBtn Up _) = False
+    handleInput s _ = s
+    step s _ = s
+
 main :: IO ()
-main = animate 30 (800,600) myPic
+main = myAnimation --or myGame

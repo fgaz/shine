@@ -3,25 +3,35 @@ module Shine (
   Color (..),
   circle,
   animate,
+  animateIO,
+  play,
+  playIO,
   (<>)
 ) where
 
 import GHCJS.DOM (webViewGetDomDocument, runWebGUI)
-import GHCJS.DOM.Document (getBody, getElementById)
+import GHCJS.DOM.Document (getBody, getElementById, mouseUp, mouseDown)
+import GHCJS.DOM.EventM (on, mouseButton, mouseCtrlKey, mouseAltKey, mouseShiftKey, mouseMetaKey)
 import GHCJS.DOM.Element (setInnerHTML)
 import GHCJS.DOM.HTMLCanvasElement (getContext)
 import GHCJS.DOM.CanvasRenderingContext2D
 import GHCJS.DOM.Enums (CanvasWindingRule (CanvasWindingRuleNonzero))
-import GHCJS.DOM.Types (Window, CanvasStyle (..))
+import GHCJS.DOM.Types (Window, CanvasStyle (..), Document, MouseEvent)
 
 import GHCJS.Prim (JSVal)
 import GHCJS.Marshal
 import Unsafe.Coerce (unsafeCoerce)
 import Data.Monoid ((<>))
 import Control.Concurrent (threadDelay)
-import Control.Monad (when)
+import Control.Concurrent.MVar (newMVar, modifyMVar, modifyMVar_)
+import Control.Monad (when, foldM)
+import Control.Monad.Trans (liftIO)
+import Control.Monad.Trans.Reader (ReaderT)
 import Data.Time.Clock (getCurrentTime, diffUTCTime)
 import Data.List (intercalate)
+import Data.Maybe (isJust, fromJust)
+
+import Shine.Input
 
 -- | A color given r, g, b (all from 0 to 255) and alpha (from 0 to 1)
 data Color = Color Int Int Int Float
@@ -60,14 +70,14 @@ instance Monoid Picture where
     mempty = Empty
     mappend = Over
 
-initCanvas :: Window -> Int -> Int -> IO CanvasRenderingContext2D
+initCanvas :: Window -> Int -> Int -> IO (Document, CanvasRenderingContext2D)
 initCanvas webView x y = do
     Just doc <- webViewGetDomDocument webView
     Just body <- getBody doc
     setInnerHTML body (Just $ canvasHtml x y)
     Just c <- getElementById doc "canvas"
     ctx <- getContext (unsafeCoerce c) "2d" :: IO JSVal
-    return $ unsafeCoerce ctx --how do i get a 2dcontext properly? This works for now.
+    return (doc, unsafeCoerce ctx) --how do i get a 2dcontext properly? This works for now.
 
 -- | Draws a picture which depends only on the time
 animate :: Float -- ^ FPS
@@ -83,7 +93,7 @@ animateIO :: Float -- ^ FPS
           -> (CanvasRenderingContext2D -> Float -> IO Picture) -- ^ Your drawing function
           -> IO ()
 animateIO fps (x,y) f = runWebGUI $ \ webView -> do
-    ctx <- initCanvas webView x y
+    (_, ctx) <- initCanvas webView x y
     let loop t = do
         stamp <- getCurrentTime
         clearRect ctx 0 0 (fromIntegral x) (fromIntegral y)
@@ -97,6 +107,66 @@ animateIO fps (x,y) f = runWebGUI $ \ webView -> do
         loop (t + 1/fps) --MAYBE change to currentTime - startTime
       in
         loop 0
+
+play :: Float
+     -> (Int, Int)
+     -> state
+     -> (state -> Picture)
+     -> (state -> Input -> state) --MAYBE flip args
+     -> (state -> Float -> state) --MAYBE flip args
+     -> IO ()
+play fps xy initialState draw' {-rename draw to render-} handleInput step =
+  playIO
+    fps
+    xy
+    initialState
+    (\_ s -> return $ draw' s)
+    (\_ s i -> return $ handleInput s i)
+    (\_ s t -> return $ step s t)
+
+getModifiers :: ReaderT MouseEvent IO Modifiers
+getModifiers = Modifiers
+                   <$> fmap toKeyState mouseCtrlKey
+                   <*> fmap toKeyState mouseAltKey
+                   <*> fmap toKeyState mouseShiftKey
+                   <*> fmap toKeyState mouseMetaKey
+
+playIO :: Float -- ^ FPS
+       -> (Int,Int) -- ^ Canvas dimensions
+       -> state
+       -> (CanvasRenderingContext2D -> state -> IO Picture) -- ^ Your drawing function
+       -> (CanvasRenderingContext2D -> state -> Input -> IO state)
+       -> (CanvasRenderingContext2D -> state -> Float -> IO state)
+       -> IO ()
+playIO fps (x,y) initialState draw' {-rename draw to render-} handleInput step = runWebGUI $ \ webView -> do
+    (doc, ctx) <- initCanvas webView x y
+    inputM <- newMVar []
+    _ <- on doc mouseDown $ do
+        btn <- fmap toMouseButton mouseButton
+        modifiers <- getModifiers
+        when (isJust btn) $
+          liftIO $ modifyMVar_ inputM $ fmap return (MouseButton (fromJust btn) Down modifiers :) -- :-) :D XD
+    _ <- on doc mouseUp $ do
+        btn <- fmap toMouseButton mouseButton
+        modifiers <- getModifiers
+        when (isJust btn) $
+          liftIO $ modifyMVar_ inputM $ fmap return (MouseButton (fromJust btn) Up modifiers :) -- :-) :D XD
+    let loop state = do
+        stamp <- getCurrentTime
+        inputs <- modifyMVar inputM $ \xs -> return ([], reverse xs)
+        state' <- foldM (handleInput ctx) state inputs
+        state'' <- step ctx state' (1/fps) --MAYBE change 1/fps to actual td
+        clearRect ctx 0 0 (fromIntegral x) (fromIntegral y)
+        setTransform ctx 1 0 0 1 0 0 -- reset transforms (and accumulated errors!).
+        pic <- draw' ctx state''
+        draw ctx pic
+        now <- getCurrentTime
+        let td = diffUTCTime now stamp
+        when (realToFrac td <= 1 / fps) $
+          threadDelay $ floor $ (*1000000) (1 / fps - realToFrac td)
+        loop state''
+      in
+        loop initialState
 
 canvasHtml :: Int -> Int -> String
 canvasHtml x y = "<canvas id=\"canvas\" \
