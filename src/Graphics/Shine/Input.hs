@@ -1,4 +1,4 @@
-module Shine.Input where
+module Graphics.Shine.Input where
 
 import Web.KeyCode
 

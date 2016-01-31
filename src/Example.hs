@@ -1,5 +1,5 @@
-import Shine
-import Shine.Input
+import Graphics.Shine
+import Graphics.Shine.Input
 
 myPic :: Float -> Picture
 myPic x = Translate (75+x'/2) 15 (RectF (150+x') 30)

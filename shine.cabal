@@ -1,0 +1,39 @@
+name: shine
+version: 0.1.0.0
+cabal-version: >=1.6
+build-type: Simple
+license: MIT
+license-file: LICENSE
+copyright: (c) Francesco Gazzetta
+maintainer: Francesco Gazzetta <francygazz@gmail.com>
+stability: experimental
+homepage: https://github.com/fgaz/shine
+bug-reports: https://github.com/fgaz/shine/issues
+synopsis: Declarative graphics for the browser using GHCJS
+description: A declarative graphics library heavily inspired by `gloss`
+category: Web, Graphics
+author: Francesco Gazzetta
+data-dir: ""
+
+source-repository head
+    type: git
+    location: https://github.com/fgaz/shine
+
+library
+    exposed-modules: Graphics.Shine,
+                     Graphics.Shine.Input
+    build-depends: base >=4.2 && <5,
+                   ghcjs-dom >=0.2 && <0.3,
+                   ghcjs-prim,
+                   keycode,
+                   time,
+                   mtl,
+                   transformers
+    hs-source-dirs: src
+    ghc-options: -O2 -Wall
+
+--executable shine-example
+--    build-depends: base >=4.2 && <5,
+--                   ghcjs-dom >=0.2 && <0.3
+--    main-is: Example.hs
+--    hs-source-dirs: src

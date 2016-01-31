@@ -6,10 +6,8 @@ Heavily inspired by `gloss`
 
 ## Compiling
 
-You'll need `ghcjs`, `ghcjs-dom` and `time` (which come preinstalled I think).
-
-Simply import the library and run `ghcjs Yourprogram.hs`
+You'll need [`ghcjs`](https://github.com/ghcjs/ghcjs)
 
 ## Usage
 
-See `Example.hs` (a simple animation)
+See `src/Example.hs`

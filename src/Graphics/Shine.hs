@@ -1,4 +1,4 @@
-module Shine (
+module Graphics.Shine (
   Picture (..),
   Color (..),
   circle,
@@ -18,8 +18,7 @@ import GHCJS.DOM.CanvasRenderingContext2D
 import GHCJS.DOM.Enums (CanvasWindingRule (CanvasWindingRuleNonzero))
 import GHCJS.DOM.Types (Window, CanvasStyle (..), Document, MouseEvent)
 
-import GHCJS.Prim (JSVal)
-import GHCJS.Marshal
+import GHCJS.Prim (JSVal, toJSString)
 import Unsafe.Coerce (unsafeCoerce)
 import Data.Monoid ((<>))
 import Control.Concurrent (threadDelay)
@@ -31,7 +30,7 @@ import Data.Time.Clock (getCurrentTime, diffUTCTime)
 import Data.List (intercalate)
 import Data.Maybe (isJust, fromJust)
 
-import Shine.Input
+import Graphics.Shine.Input
 
 -- | A color given r, g, b (all from 0 to 255) and alpha (from 0 to 1)
 data Color = Color Int Int Int Float
@@ -208,12 +207,12 @@ draw ctx (Colored (Color r g b a) pic) = do
     let colorString = "rgba("
                    ++ intercalate "," [show r, show g, show b, show a]
                    ++ ")"
-    color <- toJSVal colorString
+    let color = toJSString colorString
     setFillStyle ctx $ Just $ CanvasStyle color
     setStrokeStyle ctx $ Just $ CanvasStyle color
     draw ctx pic
     -- set the color back to black
-    black <- toJSVal "#000000"
+    let black = toJSString "#000000"
     setFillStyle ctx $ Just $ CanvasStyle black
     setStrokeStyle ctx $ Just $ CanvasStyle black
 draw ctx (Rotate angle pic) = do
