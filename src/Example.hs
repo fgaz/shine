@@ -12,6 +12,7 @@ myPic x = Translate (75+x'/2) 15 (RectF (150+x') 30)
        <> Colored (Color 255 0 0 1.0) (Translate 800 500 $ CircleF (x'/10))
        <> foldMap (Translate 300 300 . circle) [1,5..x']
        <> Translate 350 350 (Rotate (x'/200) $ RectF 150 30)
+       <> Translate 600 500 (Text "20px Sans" CenterAlign 300 "The quick brown fox jumps over the lazy dog")
     where x' = sin (x*3) *100 +100
 
 myAnimation :: IO ()

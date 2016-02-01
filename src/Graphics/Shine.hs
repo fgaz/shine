@@ -1,6 +1,7 @@
 module Graphics.Shine (
   Picture (..),
   Color (..),
+  TextAlignment (..),
   circle,
   animate,
   animateIO,
@@ -36,6 +37,10 @@ import Data.Maybe (isJust, fromJust)
 
 import Graphics.Shine.Input
 
+type Font = String
+
+data TextAlignment = LeftAlign | CenterAlign | RightAlign
+
 -- | A color given r, g, b (all from 0 to 255) and alpha (from 0 to 1)
 data Color = Color Int Int Int Float
 
@@ -53,6 +58,8 @@ data Picture = Empty -- ^ The empty picture. Draws nothing.
              | Arc Float Float Float Bool
              -- | A filled circle from the radius
              | CircleF Float
+             -- | Draws some text (the float is the max width, the font is in js-style (es. "12px Sans"))
+             | Text Font TextAlignment Float String
              -- | Draws the second Picture over the First
              | Over Picture Picture
              -- | Applies the color to the picture.
@@ -220,6 +227,12 @@ draw ctx (CircleF r) = do
     clip ctx CanvasWindingRuleNonzero
     draw ctx $ RectF (r*2) (r*2)
     restore ctx
+draw ctx (Text font align width txt) = do
+    setFont ctx font
+    setTextAlign ctx $ case align of LeftAlign -> "left"
+                                     CenterAlign -> "center"
+                                     RightAlign -> "rignt"
+    fillText ctx txt 0 0 width
 draw ctx (Over a b) = do
     draw ctx a
     draw ctx b
