@@ -10,10 +10,11 @@ data Modifiers = Modifiers { ctrl :: KeyState
                            , meta :: KeyState }
                  deriving (Show, Eq)
 
-data MouseButton = LeftBtn | RightBtn | MiddleBtn | WheelUp | WheelDown deriving (Show, Eq)
+data MouseButton = LeftBtn | RightBtn | MiddleBtn deriving (Show, Eq)
 
 data Input = Keyboard Key KeyState Modifiers
            | MouseButton MouseButton KeyState Modifiers
+           | MouseWheel (Double, Double)
            | MouseMove (Int, Int)
            deriving (Show, Eq)
 

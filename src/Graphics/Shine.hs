@@ -10,8 +10,10 @@ module Graphics.Shine (
 ) where
 
 import GHCJS.DOM (webViewGetDomDocument, runWebGUI)
-import GHCJS.DOM.Document (getBody, getElementById, mouseUp, mouseDown)
-import GHCJS.DOM.EventM (on, mouseButton, mouseCtrlKey, mouseAltKey, mouseShiftKey, mouseMetaKey)
+import GHCJS.DOM.Document (getBody, getElementById, mouseUp, mouseDown, mouseMove, wheel, keyDown, keyUp)
+import GHCJS.DOM.EventM (on, mouseButton, mouseCtrlKey, mouseAltKey, mouseShiftKey, mouseMetaKey, mouseClientXY, uiKeyCode, event)
+import GHCJS.DOM.WheelEvent (getDeltaX, getDeltaY)
+import GHCJS.DOM.KeyboardEvent (KeyboardEvent, getCtrlKey, getShiftKey, getAltKey, getMetaKey)
 import GHCJS.DOM.Element (setInnerHTML)
 import GHCJS.DOM.HTMLCanvasElement (getContext)
 import GHCJS.DOM.CanvasRenderingContext2D
@@ -19,6 +21,7 @@ import GHCJS.DOM.Enums (CanvasWindingRule (CanvasWindingRuleNonzero))
 import GHCJS.DOM.Types (Window, CanvasStyle (..), Document, MouseEvent)
 
 import GHCJS.Prim (JSVal, toJSString)
+import Web.KeyCode (keyCodeLookup)
 import Unsafe.Coerce (unsafeCoerce)
 import Data.Monoid ((<>))
 import Control.Concurrent (threadDelay)
@@ -123,12 +126,19 @@ play fps xy initialState draw' {-rename draw to render-} handleInput step =
     (\_ s i -> return $ handleInput s i)
     (\_ s t -> return $ step s t)
 
-getModifiers :: ReaderT MouseEvent IO Modifiers
-getModifiers = Modifiers
+getModifiersMouse :: ReaderT MouseEvent IO Modifiers
+getModifiersMouse = Modifiers
                    <$> fmap toKeyState mouseCtrlKey
                    <*> fmap toKeyState mouseAltKey
                    <*> fmap toKeyState mouseShiftKey
                    <*> fmap toKeyState mouseMetaKey
+
+getModifiersKeyboard :: ReaderT KeyboardEvent IO Modifiers
+getModifiersKeyboard = Modifiers
+                   <$> fmap toKeyState (event >>= getCtrlKey)
+                   <*> fmap toKeyState (event >>= getAltKey)
+                   <*> fmap toKeyState (event >>= getShiftKey)
+                   <*> fmap toKeyState (event >>= getMetaKey)
 
 playIO :: Float -- ^ FPS
        -> (Int,Int) -- ^ Canvas dimensions
@@ -142,14 +152,28 @@ playIO fps (x,y) initialState draw' {-rename draw to render-} handleInput step =
     inputM <- newMVar []
     _ <- on doc mouseDown $ do
         btn <- fmap toMouseButton mouseButton
-        modifiers <- getModifiers
+        modifiers <- getModifiersMouse
         when (isJust btn) $
           liftIO $ modifyMVar_ inputM $ fmap return (MouseButton (fromJust btn) Down modifiers :) -- :-) :D XD
     _ <- on doc mouseUp $ do
         btn <- fmap toMouseButton mouseButton
-        modifiers <- getModifiers
+        modifiers <- getModifiersMouse
         when (isJust btn) $
           liftIO $ modifyMVar_ inputM $ fmap return (MouseButton (fromJust btn) Up modifiers :) -- :-) :D XD
+    _ <- on doc mouseMove $ do
+        coords <- mouseClientXY
+        liftIO $ modifyMVar_ inputM $ fmap return (MouseMove coords :) -- :-) :D XD
+    _ <- on doc wheel $ do
+        delta <- (,) <$> (event >>= getDeltaX) <*> (event >>= getDeltaY)
+        liftIO $ modifyMVar_ inputM $ fmap return (MouseWheel delta :) -- :-) :D XD
+    _ <- on doc keyDown $ do
+        key <- uiKeyCode
+        modifiers <- getModifiersKeyboard
+        liftIO $ modifyMVar_ inputM $ fmap return (Keyboard (keyCodeLookup key) Down modifiers :) -- :-) :D XD
+    _ <- on doc keyUp $ do
+        key <- uiKeyCode
+        modifiers <- getModifiersKeyboard
+        liftIO $ modifyMVar_ inputM $ fmap return (Keyboard (keyCodeLookup key) Up modifiers :) -- :-) :D XD
     let loop state = do
         stamp <- getCurrentTime
         inputs <- modifyMVar inputM $ \xs -> return ([], reverse xs)
