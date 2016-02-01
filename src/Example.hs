@@ -23,10 +23,10 @@ myGame = play 30 (800,600) initialState draw handleInput step
     initialState = False
     draw False = Empty
     draw True = RectF 300 300
-    handleInput _ (MouseButton LeftBtn Down _) = True
-    handleInput _ (MouseButton LeftBtn Up _) = False
-    handleInput s _ = s
-    step s _ = s
+    handleInput (MouseButton LeftBtn Down _) = const True
+    handleInput (MouseButton LeftBtn Up _) = const False
+    handleInput _ = id
+    step _ = id
 
 main :: IO ()
 main = myAnimation --or myGame

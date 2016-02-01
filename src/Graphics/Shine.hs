@@ -29,6 +29,7 @@ import Control.Concurrent.MVar (newMVar, modifyMVar, modifyMVar_)
 import Control.Monad (when, foldM)
 import Control.Monad.Trans (liftIO)
 import Control.Monad.Trans.Reader (ReaderT)
+import Data.Foldable (foldrM)
 import Data.Time.Clock (getCurrentTime, diffUTCTime)
 import Data.List (intercalate)
 import Data.Maybe (isJust, fromJust)
@@ -114,8 +115,8 @@ play :: Float
      -> (Int, Int)
      -> state
      -> (state -> Picture)
-     -> (state -> Input -> state) --MAYBE flip args
-     -> (state -> Float -> state) --MAYBE flip args
+     -> (Input -> state -> state) --MAYBE flip args
+     -> (Float -> state -> state) --MAYBE flip args
      -> IO ()
 play fps xy initialState draw' {-rename draw to render-} handleInput step =
   playIO
@@ -144,8 +145,8 @@ playIO :: Float -- ^ FPS
        -> (Int,Int) -- ^ Canvas dimensions
        -> state
        -> (CanvasRenderingContext2D -> state -> IO Picture) -- ^ Your drawing function
-       -> (CanvasRenderingContext2D -> state -> Input -> IO state)
-       -> (CanvasRenderingContext2D -> state -> Float -> IO state)
+       -> (CanvasRenderingContext2D -> Input -> state -> IO state)
+       -> (CanvasRenderingContext2D -> Float -> state -> IO state)
        -> IO ()
 playIO fps (x,y) initialState draw' {-rename draw to render-} handleInput step = runWebGUI $ \ webView -> do
     (doc, ctx) <- initCanvas webView x y
@@ -176,9 +177,9 @@ playIO fps (x,y) initialState draw' {-rename draw to render-} handleInput step =
         liftIO $ modifyMVar_ inputM $ fmap return (Keyboard (keyCodeLookup key) Up modifiers :) -- :-) :D XD
     let loop state = do
         stamp <- getCurrentTime
-        inputs <- modifyMVar inputM $ \xs -> return ([], reverse xs)
-        state' <- foldM (handleInput ctx) state inputs
-        state'' <- step ctx state' (1/fps) --MAYBE change 1/fps to actual td
+        inputs <- modifyMVar inputM $ \xs -> return ([], xs)
+        state' <- foldrM (handleInput ctx) state inputs
+        state'' <- step ctx (1/fps) state' --MAYBE change 1/fps to actual td
         clearRect ctx 0 0 (fromIntegral x) (fromIntegral y)
         setTransform ctx 1 0 0 1 0 0 -- reset transforms (and accumulated errors!).
         pic <- draw' ctx state''
