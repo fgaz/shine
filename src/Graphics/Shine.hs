@@ -17,6 +17,7 @@ import GHCJS.DOM.WheelEvent (getDeltaX, getDeltaY)
 import GHCJS.DOM.KeyboardEvent (KeyboardEvent, getCtrlKey, getShiftKey, getAltKey, getMetaKey)
 import GHCJS.DOM.Element (setInnerHTML)
 import GHCJS.DOM.HTMLCanvasElement (getContext)
+import GHCJS.DOM.HTMLImageElement (getWidth, getHeight)
 import GHCJS.DOM.CanvasRenderingContext2D
 import GHCJS.DOM.Enums (CanvasWindingRule (CanvasWindingRuleNonzero))
 import GHCJS.DOM.Types (Window, CanvasStyle (..), Document, MouseEvent)
@@ -36,6 +37,7 @@ import Data.List (intercalate)
 import Data.Maybe (isJust, fromJust)
 
 import Graphics.Shine.Input
+import Graphics.Shine.Image
 
 type Font = String
 
@@ -60,6 +62,8 @@ data Picture = Empty -- ^ The empty picture. Draws nothing.
              | CircleF Float
              -- | Draws some text (the float is the max width, the font is in js-style (es. "12px Sans"))
              | Text Font TextAlignment Float String
+             -- | Draws an image
+             | Image ImageSize HTMLImageElement
              -- | Draws the second Picture over the First
              | Over Picture Picture
              -- | Applies the color to the picture.
@@ -70,7 +74,7 @@ data Picture = Empty -- ^ The empty picture. Draws nothing.
              | Rotate Float Picture
              -- | Moves the Picture by the given x and y distances
              | Translate Float Float Picture
-             -- TODO stroke
+             -- TODO stroke, polygon
 
 -- | A circle from the center coordinates and radius
 circle :: Float -> Picture
@@ -233,6 +237,21 @@ draw ctx (Text font align width txt) = do
                                      CenterAlign -> "center"
                                      RightAlign -> "rignt"
     fillText ctx txt 0 0 width
+draw ctx (Image size img) = do
+    case size of
+      Original -> do
+          x <- fmap ((/(-2)) . realToFrac) $ getWidth img
+          y <- fmap ((/(-2)) . realToFrac) $ getHeight img
+          drawImage ctx (Just img) x y
+      (Stretched w h) -> do
+          let (x, y) = (-w/2, -h/2)
+          drawImageScaled ctx (Just img) x y w h
+      (Clipped a b c d) -> do
+          let (x, y) = (-c/2, -d/2)
+          drawImagePart ctx (Just img) a b c d x y c d
+      (ClippedStretched a b c d e f) -> do
+          let (x, y) = (-e/2, -f/2)
+          drawImagePart ctx (Just img) a b c d x y e f
 draw ctx (Over a b) = do
     draw ctx a
     draw ctx b
