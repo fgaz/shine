@@ -3,6 +3,7 @@ module Graphics.Shine (
   Color (..),
   TextAlignment (..),
   circle,
+  path,
   animate,
   animateIO,
   play,
@@ -79,6 +80,9 @@ data Picture = Empty -- ^ The empty picture. Draws nothing.
 -- | A circle from the center coordinates and radius
 circle :: Float -> Picture
 circle r = Arc r 0 (2*3.14) False
+
+path :: [(Float,Float)] -> Picture
+path xs = foldMap (\((x,y),(x',y')) -> Line x y x' y') $ zip xs $ tail xs
 
 instance Monoid Picture where
     mempty = Empty
