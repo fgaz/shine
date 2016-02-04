@@ -268,9 +268,8 @@ draw ctx (Image size img) = do
 draw ctx (Over a b) = do
     draw ctx a
     draw ctx b
-draw ctx (Colored col (Over a b)) = do
-    draw ctx $ Colored col a
-    draw ctx $ Colored col b
+draw ctx (Colored col (Over a b)) = draw ctx $ Over (Colored col a)
+                                                    (Colored col b)
 draw ctx (Colored _ (Colored col pic)) =
     draw ctx $ Colored col pic --the innermost color wins
 draw ctx (Colored (Color r g b a) pic) = do
