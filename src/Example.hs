@@ -15,6 +15,14 @@ myPic img x =
     <> foldMap (Translate 300 300 . circle) [1,5..x']
     <> Translate 350 350 (Rotate (x'/200) $ RectF 150 30)
     <> Translate 100 500 (Image Original img)
+    <> Colored (Color 0 0 255 1) -- blue pentagon
+           (Translate 200 500
+               (Polygon [ (-110,-80)
+                        , (50,-120)
+                        , (140,20)
+                        , (30,140)
+                        , (-120,80)
+                        ]))
     <> Translate 600 500 (Text "20px Sans" CenterAlign 300 "The quick brown fox jumps over the lazy dog")
   where x' = sin (x*3) *100 +100
 

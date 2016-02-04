@@ -55,6 +55,8 @@ data Picture = Empty -- ^ The empty picture. Draws nothing.
              | RectF Float Float
              -- | A line from the coordinates of two points
              | Line Float Float Float Float
+             -- | A polygon from a list of vertices
+             | Polygon [(Float, Float)]
              -- | An arc from the radius, start angle, end angle.
              -- If the last parameter is True, the direction is counterclockwise
              -- TODO replace with Clockwise | Counterclockwise or remove entirely
@@ -225,6 +227,13 @@ draw ctx (Rect x y) = do
     rect ctx (-x/2) (-y/2) x y
     stroke ctx
 draw ctx (RectF x y) = fillRect ctx (-x/2) (-y/2) x y
+draw ctx (Polygon ((x,y):pts)) = do
+    beginPath ctx
+    moveTo ctx x y
+    mapM_ (\(x', y') -> lineTo ctx x' y') pts
+    closePath ctx
+    fill ctx CanvasWindingRuleNonzero
+draw ctx (Polygon []) = draw ctx Empty
 draw ctx (Arc r a b direction) = do
     beginPath ctx
     arc ctx 0 0 r a b direction
