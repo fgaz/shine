@@ -270,6 +270,22 @@ draw ctx (Over a b) = do
     draw ctx b
 draw ctx (Colored col (Over a b)) = draw ctx $ Over (Colored col a)
                                                     (Colored col b)
+-- push all the Colors to the leaves to avoid things like
+-- Color blue $ Translate _ _ $ Over (Color red pic) pic'
+-- in which pic' would be black instead of blue:
+-- do
+--   set color blue -- first Colored
+--   translate
+--   set color red -- second Colored
+--   draw pic
+--   set color back to black -- second Colored
+--   draw pic' -- now this is black!
+--   translate back
+--   set color back to black -- first Colored
+draw ctx (Colored col (Rotate angle pic)) =
+    draw ctx $ Rotate angle $ Colored col pic
+draw ctx (Colored col (Translate x y pic)) =
+    draw ctx $ Translate x y $ Colored col pic
 draw ctx (Colored _ (Colored col pic)) =
     draw ctx $ Colored col pic --the innermost color wins
 draw ctx (Colored (Color r g b a) pic) = do
