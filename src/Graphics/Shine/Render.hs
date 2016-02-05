@@ -27,7 +27,7 @@ render ctx (RectF x y) = fillRect ctx (-x/2) (-y/2) x y
 render ctx (Polygon ((x,y):pts)) = do
     beginPath ctx
     moveTo ctx x y
-    mapM_ (\(x', y') -> lineTo ctx x' y') pts
+    mapM_ (uncurry (lineTo ctx)) pts
     closePath ctx
     fill ctx CanvasWindingRuleNonzero
 render ctx (Polygon []) = render ctx Empty
@@ -47,11 +47,11 @@ render ctx (Text font align width txt) = do
                                      CenterAlign -> "center"
                                      RightAlign -> "rignt"
     fillText ctx txt 0 0 width
-render ctx (Image size img) = do
+render ctx (Image size img) =
     case size of
       Original -> do
-          x <- fmap ((/(-2)) . realToFrac) $ getWidth img
-          y <- fmap ((/(-2)) . realToFrac) $ getHeight img
+          x <- ((/(-2)) . realToFrac) <$> getWidth img
+          y <- ((/(-2)) . realToFrac) <$> getHeight img
           drawImage ctx (Just img) x y
       (Stretched w h) -> do
           let (x, y) = (-w/2, -h/2)
