@@ -14,10 +14,10 @@ import Graphics.Shine.Image
 
 type Font = String
 
-data TextAlignment = LeftAlign | CenterAlign | RightAlign
+data TextAlignment = LeftAlign | CenterAlign | RightAlign deriving (Eq, Show)
 
 -- | A color given r, g, b (all from 0 to 255) and alpha (from 0 to 1)
-data Color = Color Int Int Int Float
+data Color = Color Int Int Int Float deriving (Eq, Show)
 
 -- | A drawable element. All Pictures are centered.
 data Picture =
@@ -52,6 +52,7 @@ data Picture =
              -- | Moves the Picture by the given x and y distances
              | Translate Float Float Picture
              -- TODO stroke
+             deriving Eq --TODO show, with a newtype for Image
 
 -- | A circle from the center coordinates and radius
 circle :: Float -> Picture
@@ -63,3 +64,5 @@ path xs = foldMap (\((x,y),(x',y')) -> Line x y x' y') $ zip xs $ tail xs
 instance Monoid Picture where
     mempty = Empty
     mappend = Over
+
+instance Show Picture where

@@ -15,6 +15,7 @@ data ImageSize = Original -- ^ The orizinal size of the file
                | Clipped Float Float Float Float
                -- | Clip (x,y,width,height) and scale (width, height) the image
                | ClippedStretched Float Float Float Float Float Float
+               deriving (Eq, Show)
 
 foreign import javascript unsafe "$r = new Image();"
     js_newImage        :: IO HTMLImageElement
