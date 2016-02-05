@@ -20,7 +20,9 @@ data TextAlignment = LeftAlign | CenterAlign | RightAlign
 data Color = Color Int Int Int Float
 
 -- | A drawable element. All Pictures are centered.
-data Picture = Empty -- ^ The empty picture. Draws nothing.
+data Picture =
+             -- | The empty picture. Draws nothing.
+             Empty
              -- | A rectangle from the dimensions
              | Rect Float Float
              -- | Same thing but filled
