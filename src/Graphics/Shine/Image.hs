@@ -1,3 +1,5 @@
+{-# LANGUAGE ForeignFunctionInterface #-}
+
 module Graphics.Shine.Image (
   makeImage,
   ImageSize (..),

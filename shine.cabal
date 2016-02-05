@@ -21,7 +21,10 @@ source-repository head
 
 library
     exposed-modules: Graphics.Shine,
-                     Graphics.Shine.Input
+                     Graphics.Shine.Input,
+                     Graphics.Shine.Image,
+                     Graphics.Shine.Picture,
+                     Graphics.Shine.Render
     build-depends: base >=4.2 && <5,
                    ghcjs-dom >=0.2 && <0.3,
                    ghcjs-prim,
