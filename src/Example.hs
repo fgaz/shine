@@ -1,6 +1,7 @@
 import Graphics.Shine
 import Graphics.Shine.Input
 import Graphics.Shine.Image
+import Graphics.Shine.Picture
 
 myPic :: HTMLImageElement ->  Float -> Picture
 myPic img x =
