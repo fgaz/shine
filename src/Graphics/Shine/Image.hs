@@ -3,14 +3,16 @@
 module Graphics.Shine.Image (
   makeImage,
   ImageSize (..),
-  HTMLImageElement
+  ImageData (..),
 ) where
 
 import GHCJS.DOM.HTMLImageElement
 
+newtype ImageData = ImageData { unImageData :: HTMLImageElement } deriving Eq
+
 -- we need this to show Pictures
-instance Show HTMLImageElement where
-    show _ = "HTMLImageElement"
+instance Show ImageData where
+    show _ = "ImageData"
 
 -- | How big (and how stretched/cropped) the Image is drawn
 data ImageSize =
@@ -29,8 +31,8 @@ foreign import javascript unsafe "$r = new Image();"
 
 
 -- | Makes an image element from an URL
-makeImage :: FilePath -> IO HTMLImageElement
+makeImage :: FilePath -> IO ImageData
 makeImage url = do
     img <- js_newImage
     setSrc img url
-    return img
+    return $ ImageData img

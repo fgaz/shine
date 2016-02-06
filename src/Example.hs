@@ -3,7 +3,7 @@ import Graphics.Shine.Input
 import Graphics.Shine.Image
 import Graphics.Shine.Picture
 
-myPic :: HTMLImageElement ->  Float -> Picture
+myPic :: ImageData ->  Float -> Picture
 myPic img x =
     Translate (75+x'/2) 15 (RectF (150+x') 30)
     <> Colored (Color 255 0 0 1.0) (Translate 15 (75+x'/2) $ Rect 30 (150+x'))

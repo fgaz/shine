@@ -41,7 +41,7 @@ data Picture =
              -- | Draws some text (the float is the max width, the font is in js-style (ex. "12px Sans"))
              | Text Font TextAlignment Float String
              -- | Draws an image
-             | Image ImageSize HTMLImageElement
+             | Image ImageSize ImageData
              -- | Draws the second Picture over the First
              | Over Picture Picture
              -- | Applies the color to the picture.

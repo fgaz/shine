@@ -48,7 +48,7 @@ render ctx (Text font align width txt) = do
                                      CenterAlign -> "center"
                                      RightAlign -> "rignt"
     fillText ctx txt 0 0 width
-render ctx (Image size img) =
+render ctx (Image size (ImageData img)) =
     case size of
       Original -> do
           x <- ((/(-2)) . realToFrac) <$> getWidth img
