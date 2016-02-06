@@ -8,6 +8,9 @@ module Graphics.Shine.Image (
 
 import GHCJS.DOM.HTMLImageElement
 
+instance Show HTMLImageElement where
+    show _ = "HTMLImageElement"
+
 data ImageSize = Original -- ^ The orizinal size of the file
                -- | Scale the image to the given dimensions
                | Stretched Float Float

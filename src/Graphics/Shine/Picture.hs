@@ -52,7 +52,7 @@ data Picture =
              -- | Moves the Picture by the given x and y distances
              | Translate Float Float Picture
              -- TODO stroke
-             deriving Eq --TODO show, with a newtype for Image
+             deriving (Eq, Show)
 
 -- | A circle from the center coordinates and radius
 circle :: Float -> Picture
@@ -64,5 +64,3 @@ path xs = foldMap (\((x,y),(x',y')) -> Line x y x' y') $ zip xs $ tail xs
 instance Monoid Picture where
     mempty = Empty
     mappend = Over
-
-instance Show Picture where
