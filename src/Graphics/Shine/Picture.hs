@@ -11,9 +11,10 @@ module Graphics.Shine.Picture (
 import Data.Monoid ((<>))
 import Graphics.Shine.Image
 
-
+-- | Js-style font, ex. "12px Sans"
 type Font = String
 
+-- | How the text should be aligned
 data TextAlignment = LeftAlign | CenterAlign | RightAlign deriving (Eq, Show)
 
 -- | A color given r, g, b (all from 0 to 255) and alpha (from 0 to 1)
@@ -37,7 +38,7 @@ data Picture =
              | Arc Float Float Float Bool
              -- | A filled circle from the radius
              | CircleF Float
-             -- | Draws some text (the float is the max width, the font is in js-style (es. "12px Sans"))
+             -- | Draws some text (the float is the max width, the font is in js-style (ex. "12px Sans"))
              | Text Font TextAlignment Float String
              -- | Draws an image
              | Image ImageSize HTMLImageElement
@@ -58,9 +59,13 @@ data Picture =
 circle :: Float -> Picture
 circle r = Arc r 0 (2*3.14) False
 
+-- | Shorthand to draw a series of lines
 path :: [(Float,Float)] -> Picture
 path xs = foldMap (\((x,y),(x',y')) -> Line x y x' y') $ zip xs $ tail xs
 
+-- | Pictures are Monoids. The identity is an empty (completely transparent)
+-- picture and the composing function is the overlapping (the right picture is
+-- drawn over the left one).
 instance Monoid Picture where
     mempty = Empty
     mappend = Over

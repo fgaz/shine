@@ -14,6 +14,7 @@ import Graphics.Shine.Picture
 import Graphics.Shine.Image
 
 
+-- | Renders a picture on a 2D context.
 render :: CanvasRenderingContext2D -> Picture -> IO ()
 render _ Empty = return ()
 render ctx (Line x y x' y') = do

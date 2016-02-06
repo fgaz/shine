@@ -84,12 +84,13 @@ getModifiersKeyboard = Modifiers
                    <*> fmap toKeyState (event >>= getShiftKey)
                    <*> fmap toKeyState (event >>= getMetaKey)
 
-play :: Float
-     -> (Int, Int)
-     -> state
-     -> (state -> Picture)
-     -> (Input -> state -> state) --MAYBE flip args
-     -> (Float -> state -> state) --MAYBE flip args
+-- | Lets you manage the input.
+play :: Float -- ^ FPS
+     -> (Int, Int) -- ^ Canvas dimensions
+     -> state -- ^ Initial state
+     -> (state -> Picture) -- ^ Drawing function
+     -> (Input -> state -> state) -- ^ Input handling function
+     -> (Float -> state -> state) -- ^ Stepping function
      -> IO ()
 play fps xy initialState draw' {-rename draw to render-} handleInput step =
   playIO
@@ -100,12 +101,13 @@ play fps xy initialState draw' {-rename draw to render-} handleInput step =
     (\_ s i -> return $ handleInput s i)
     (\_ s t -> return $ step s t)
 
+-- | Same thing with I/O
 playIO :: Float -- ^ FPS
        -> (Int,Int) -- ^ Canvas dimensions
-       -> state
-       -> (CanvasRenderingContext2D -> state -> IO Picture) -- ^ Your drawing function
-       -> (CanvasRenderingContext2D -> Input -> state -> IO state)
-       -> (CanvasRenderingContext2D -> Float -> state -> IO state)
+       -> state -- ^ Initial state
+       -> (CanvasRenderingContext2D -> state -> IO Picture) -- ^ Drawing function
+       -> (CanvasRenderingContext2D -> Input -> state -> IO state) -- ^ Input handling function
+       -> (CanvasRenderingContext2D -> Float -> state -> IO state) -- ^ Stepping function
        -> IO ()
 playIO fps (x,y) initialState draw' {-rename draw to render-} handleInput step = runWebGUI $ \ webView -> do
     (doc, ctx) <- initCanvas webView x y
