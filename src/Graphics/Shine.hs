@@ -2,8 +2,7 @@ module Graphics.Shine (
   animate,
   animateIO,
   play,
-  playIO,
-  (<>)
+  playIO
 ) where
 
 import GHCJS.DOM (webViewGetDomDocument, runWebGUI)
