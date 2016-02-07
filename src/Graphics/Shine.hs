@@ -7,7 +7,7 @@ module Graphics.Shine (
 
 import GHCJS.DOM (webViewGetDomDocument, runWebGUI)
 import GHCJS.DOM.Document (getBody, getElementById, mouseUp, mouseDown, mouseMove, wheel, keyDown, keyUp)
-import GHCJS.DOM.EventM (on, mouseButton, mouseCtrlKey, mouseAltKey, mouseShiftKey, mouseMetaKey, mouseClientXY, uiKeyCode, event)
+import GHCJS.DOM.EventM (on, mouseButton, mouseCtrlKey, mouseAltKey, mouseShiftKey, mouseMetaKey, mouseOffsetXY, uiKeyCode, event)
 import GHCJS.DOM.WheelEvent (getDeltaX, getDeltaY)
 import GHCJS.DOM.KeyboardEvent (KeyboardEvent, getCtrlKey, getShiftKey, getAltKey, getMetaKey)
 import GHCJS.DOM.Element (setInnerHTML)
@@ -122,7 +122,7 @@ playIO fps (x,y) initialState draw' {-rename draw to render-} handleInput step =
         when (isJust btn) $
           liftIO $ modifyMVar_ inputM $ fmap return (MouseButton (fromJust btn) Up modifiers :) -- :-) :D XD
     _ <- on doc mouseMove $ do
-        coords <- mouseClientXY
+        coords <- mouseOffsetXY -- experimental!
         liftIO $ modifyMVar_ inputM $ fmap return (MouseMove coords :) -- :-) :D XD
     _ <- on doc wheel $ do
         delta <- (,) <$> (event >>= getDeltaX) <*> (event >>= getDeltaY)
