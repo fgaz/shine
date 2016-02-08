@@ -13,21 +13,21 @@ data Modifiers = Modifiers { ctrl :: KeyState
                  deriving (Show, Eq)
 
 -- | The three mouse buttons
-data MouseButton = LeftBtn | RightBtn | MiddleBtn deriving (Show, Eq)
+data MouseBtn = BtnLeft | BtnRight | BtnMiddle deriving (Show, Eq)
 
 -- | Datatype representing all possible inputs
 data Input = Keyboard Key KeyState Modifiers
-           | MouseButton MouseButton KeyState Modifiers
+           | MouseBtn MouseBtn KeyState Modifiers
            | MouseWheel (Double, Double)
            | MouseMove (Int, Int)
            deriving (Show, Eq)
 
 -- | Convert a js mouse button identifier to the corresponding datatype
-toMouseButton :: Word -> Maybe MouseButton
-toMouseButton 0 = Just LeftBtn
-toMouseButton 1 = Just MiddleBtn
-toMouseButton 2 = Just RightBtn
-toMouseButton _ = Nothing
+toMouseBtn :: Word -> Maybe MouseBtn
+toMouseBtn 0 = Just BtnLeft
+toMouseBtn 1 = Just BtnMiddle
+toMouseBtn 2 = Just BtnRight
+toMouseBtn _ = Nothing
 
 -- | Convert a bool (from js) to a keystate
 toKeyState :: Bool -> KeyState

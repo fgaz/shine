@@ -112,15 +112,15 @@ playIO fps (x,y) initialState draw' {-rename draw to render-} handleInput step =
     (doc, ctx) <- initCanvas webView x y
     inputM <- newMVar []
     _ <- on doc mouseDown $ do
-        btn <- fmap toMouseButton mouseButton
+        btn <- fmap toMouseBtn mouseButton
         modifiers <- getModifiersMouse
         when (isJust btn) $
-          liftIO $ modifyMVar_ inputM $ fmap return (MouseButton (fromJust btn) Down modifiers :) -- :-) :D XD
+          liftIO $ modifyMVar_ inputM $ fmap return (MouseBtn (fromJust btn) Down modifiers :) -- :-) :D XD
     _ <- on doc mouseUp $ do
-        btn <- fmap toMouseButton mouseButton
+        btn <- fmap toMouseBtn mouseButton
         modifiers <- getModifiersMouse
         when (isJust btn) $
-          liftIO $ modifyMVar_ inputM $ fmap return (MouseButton (fromJust btn) Up modifiers :) -- :-) :D XD
+          liftIO $ modifyMVar_ inputM $ fmap return (MouseBtn (fromJust btn) Up modifiers :) -- :-) :D XD
     _ <- on doc mouseMove $ do
         coords <- mouseOffsetXY -- experimental!
         liftIO $ modifyMVar_ inputM $ fmap return (MouseMove coords :) -- :-) :D XD
