@@ -38,8 +38,8 @@ myGame = play 30 (800,600) initialState draw handleInput step
     initialState = False
     draw False = Empty
     draw True = RectF 300 300
-    handleInput (MouseButton LeftBtn Down _) = const True
-    handleInput (MouseButton LeftBtn Up _) = const False
+    handleInput (MouseBtn BtnLeft Down _) = const True
+    handleInput (MouseBtn BtnLeft Up _) = const False
     handleInput _ = id
     step _ = id
 
