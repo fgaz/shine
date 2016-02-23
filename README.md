@@ -17,7 +17,7 @@ You'll need [`ghcjs`](https://github.com/ghcjs/ghcjs)
 To draw something you have to build a tree representing your drawing using
 the `Picture` datatype.
 
-```
+```haskell
 pic = Rect 10 20 -- represents a 10x20 square
 ```
 
@@ -26,7 +26,7 @@ and overlaps them.
 
 `Picture` is a monoid: `<>` is an alias for `Over` and `mempty` is the empty picture.
 
-```
+```haskell
 -- draw some shapes on top of each other
 pic = Rect 10 20
    <> Translate 30 30 (Circle 15)
@@ -36,7 +36,7 @@ pic = Rect 10 20
 
 Using `Foldable`s you can do things like
 
-```
+```haskell
 concentricCircles = foldMap Circle [1,10..100]
 ```
 
