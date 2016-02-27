@@ -35,12 +35,14 @@ import Graphics.Shine.Input
 import Graphics.Shine.Picture
 import Graphics.Shine.Render
 
-
-toContext :: Element -> IO CanvasRenderingContext2D
+-- | Get a context from a canvas element.
+toContext :: Element -- ^ this **must** be a canvas
+          -> IO CanvasRenderingContext2D
 toContext c = do
     ctx <- getContext (unsafeCoerce c) "2d" :: IO JSVal
     return $ unsafeCoerce ctx --how do i get a 2dcontext properly? This works for now.
 
+-- | Create a full screen canvas
 fullScreenCanvas :: Window -> IO CanvasRenderingContext2D
 fullScreenCanvas webView = do
     Just doc <- webViewGetDomDocument webView
@@ -55,6 +57,7 @@ fullScreenCanvas webView = do
                      \top:0px;bottom:0px;left:0px;right:0px;\">\
                      \</canvas> "
 
+-- | Create a fixed size canvas given the dimensions
 fixedSizeCanvas :: Window -> Int -> Int -> IO CanvasRenderingContext2D
 fixedSizeCanvas webView x y = do
     Just doc <- webViewGetDomDocument webView
