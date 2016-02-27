@@ -3,6 +3,8 @@ import Graphics.Shine.Input
 import Graphics.Shine.Image
 import Graphics.Shine.Picture
 
+import GHCJS.DOM (webViewGetDomDocument, runWebGUI)
+
 myPic :: ImageData ->  Float -> Picture
 myPic img x =
     Translate (75+x'/2) 15 (RectF (150+x') 30)
@@ -28,12 +30,16 @@ myPic img x =
   where x' = sin (x*3) *100 +100
 
 myAnimation :: IO ()
-myAnimation = do
+myAnimation = runWebGUI $ \ webView -> do
+    ctx <- fixedSizeCanvas webView 800 600
     img <- makeImage "httpS://placehold.it/200x70/afa"
-    animate 30 (800,600) $ myPic img
+    animate ctx 30 $ myPic img
 
 myGame :: IO ()
-myGame = play 30 (800,600) initialState draw handleInput step
+myGame = runWebGUI $ \ webView -> do
+    ctx <- fixedSizeCanvas webView 800 600
+    Just doc <- webViewGetDomDocument webView
+    play ctx doc 30 initialState draw handleInput step
   where
     initialState = False
     draw False = Empty

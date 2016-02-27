@@ -1,19 +1,23 @@
 module Graphics.Shine (
+  toContext,
+  fullScreenCanvas,
+  fixedSizeCanvas,
   animate,
   animateIO,
   play,
   playIO
 ) where
 
-import GHCJS.DOM (webViewGetDomDocument, runWebGUI)
+import GHCJS.DOM (webViewGetDomDocument)
 import GHCJS.DOM.Document (getBody, getElementById, mouseUp, mouseDown, mouseMove, wheel, keyDown, keyUp)
 import GHCJS.DOM.EventM (on, mouseButton, mouseCtrlKey, mouseAltKey, mouseShiftKey, mouseMetaKey, mouseOffsetXY, uiKeyCode, event)
+import GHCJS.DOM.EventTarget (IsEventTarget)
 import GHCJS.DOM.WheelEvent (getDeltaX, getDeltaY)
 import GHCJS.DOM.KeyboardEvent (KeyboardEvent, getCtrlKey, getShiftKey, getAltKey, getMetaKey)
 import GHCJS.DOM.Element (setInnerHTML)
 import GHCJS.DOM.HTMLCanvasElement (getContext)
 import GHCJS.DOM.CanvasRenderingContext2D
-import GHCJS.DOM.Types (Window, Document, MouseEvent)
+import GHCJS.DOM.Types (Window, Element, MouseEvent, IsDocument)
 
 import GHCJS.Prim (JSVal)
 import Web.KeyCode (keyCodeLookup)
@@ -31,35 +35,60 @@ import Graphics.Shine.Input
 import Graphics.Shine.Picture
 import Graphics.Shine.Render
 
-initCanvas :: Window -> Int -> Int -> IO (Document, CanvasRenderingContext2D)
-initCanvas webView x y = do
+
+toContext :: Element -> IO CanvasRenderingContext2D
+toContext c = do
+    ctx <- getContext (unsafeCoerce c) "2d" :: IO JSVal
+    return $ unsafeCoerce ctx --how do i get a 2dcontext properly? This works for now.
+
+fullScreenCanvas :: Window -> IO CanvasRenderingContext2D
+fullScreenCanvas webView = do
+    Just doc <- webViewGetDomDocument webView
+    Just body <- getBody doc
+    setInnerHTML body $ Just canvasHtml
+    Just c <- getElementById doc "canvas"
+    toContext c
+  where canvasHtml :: String
+        canvasHtml = "<canvas id=\"canvas\" \
+                     \style=\"border:1px \
+                     \solid #000000; \
+                     \top:0px;bottom:0px;left:0px;right:0px;\">\
+                     \</canvas> "
+
+fixedSizeCanvas :: Window -> Int -> Int -> IO CanvasRenderingContext2D
+fixedSizeCanvas webView x y = do
     Just doc <- webViewGetDomDocument webView
     Just body <- getBody doc
     setInnerHTML body (Just $ canvasHtml x y)
     Just c <- getElementById doc "canvas"
-    ctx <- getContext (unsafeCoerce c) "2d" :: IO JSVal
-    return (doc, unsafeCoerce ctx) --how do i get a 2dcontext properly? This works for now.
+    toContext c
+  where canvasHtml :: Int -> Int -> String
+        canvasHtml x' y' = "<canvas id=\"canvas\" \
+                           \width=\""++ show x' ++ "\" \
+                           \height=\""++ show y' ++ "\" \
+                           \style=\"border:1px \
+                           \solid #000000;\">\
+                           \</canvas> "
 
 -- | Draws a picture which depends only on the time
-animate :: Float -- ^ FPS
-        -> (Int,Int) -- ^ Canvas dimensions
+animate :: CanvasRenderingContext2D -- ^ the context to draw on
+        -> Float -- ^ FPS
         -> (Float -> Picture) -- ^ Your drawing function
         -> IO ()
-animate fps xy f = animateIO fps xy $ const (return . f)
+animate ctx fps f = animateIO ctx fps $ return . f
 
 -- | Draws a picture which depends only on the time... and everything else,
 -- since you can do I/O.
-animateIO :: Float -- ^ FPS
-          -> (Int,Int) -- ^ Canvas dimensions
-          -> (CanvasRenderingContext2D -> Float -> IO Picture) -- ^ Your drawing function
+animateIO :: CanvasRenderingContext2D -- ^ the context to draw on
+          -> Float -- ^ FPS
+          -> (Float -> IO Picture) -- ^ Your drawing function
           -> IO ()
-animateIO fps (x,y) f = runWebGUI $ \ webView -> do
-    (_, ctx) <- initCanvas webView x y
+animateIO ctx fps f =
     let loop t = do
         stamp <- getCurrentTime
-        clearRect ctx 0 0 (fromIntegral x) (fromIntegral y)
+        clearRect ctx (-10000) (-10000) 20000 20000 --FIXME
         setTransform ctx 1 0 0 1 0 0 -- reset transforms (and accumulated errors!).
-        pic <- f ctx t
+        pic <- f t
         render ctx pic
         now <- getCurrentTime
         let td = diffUTCTime now stamp
@@ -84,32 +113,36 @@ getModifiersKeyboard = Modifiers
                    <*> fmap toKeyState (event >>= getMetaKey)
 
 -- | Lets you manage the input.
-play :: Float -- ^ FPS
-     -> (Int, Int) -- ^ Canvas dimensions
+play :: (IsEventTarget eventElement, IsDocument eventElement)
+     => CanvasRenderingContext2D -- ^ the context to draw on
+     -> eventElement
+     -> Float -- ^ FPS
      -> state -- ^ Initial state
      -> (state -> Picture) -- ^ Drawing function
      -> (Input -> state -> state) -- ^ Input handling function
      -> (Float -> state -> state) -- ^ Stepping function
      -> IO ()
-play fps xy initialState draw' {-rename draw to render-} handleInput step =
+play ctx doc fps initialState draw' {-rename draw to render-} handleInput step =
   playIO
+    ctx
+    doc
     fps
-    xy
     initialState
-    (\_ s -> return $ draw' s)
-    (\_ s i -> return $ handleInput s i)
-    (\_ s t -> return $ step s t)
+    (return . draw')
+    (\s i -> return $ handleInput s i)
+    (\s t -> return $ step s t)
 
 -- | Same thing with I/O
-playIO :: Float -- ^ FPS
-       -> (Int,Int) -- ^ Canvas dimensions
+playIO :: (IsEventTarget eventElement, IsDocument eventElement)
+       => CanvasRenderingContext2D -- ^ the context to draw on
+       -> eventElement
+       -> Float -- ^ FPS
        -> state -- ^ Initial state
-       -> (CanvasRenderingContext2D -> state -> IO Picture) -- ^ Drawing function
-       -> (CanvasRenderingContext2D -> Input -> state -> IO state) -- ^ Input handling function
-       -> (CanvasRenderingContext2D -> Float -> state -> IO state) -- ^ Stepping function
+       -> (state -> IO Picture) -- ^ Drawing function
+       -> (Input -> state -> IO state) -- ^ Input handling function
+       -> (Float -> state -> IO state) -- ^ Stepping function
        -> IO ()
-playIO fps (x,y) initialState draw' {-rename draw to render-} handleInput step = runWebGUI $ \ webView -> do
-    (doc, ctx) <- initCanvas webView x y
+playIO ctx doc fps initialState draw' {-rename draw to render-} handleInput step = do
     inputM <- newMVar []
     _ <- on doc mouseDown $ do
         btn <- fmap toMouseBtn mouseButton
@@ -138,11 +171,11 @@ playIO fps (x,y) initialState draw' {-rename draw to render-} handleInput step =
     let loop state = do
         stamp <- getCurrentTime
         inputs <- modifyMVar inputM $ \xs -> return ([], xs)
-        state' <- foldrM (handleInput ctx) state inputs
-        state'' <- step ctx (1/fps) state' --MAYBE change 1/fps to actual td
-        clearRect ctx 0 0 (fromIntegral x) (fromIntegral y)
+        state' <- foldrM handleInput state inputs
+        state'' <- step (1/fps) state' --MAYBE change 1/fps to actual td
+        clearRect ctx (-10000) (-10000) 20000 20000 --FIXME
         setTransform ctx 1 0 0 1 0 0 -- reset transforms (and accumulated errors!).
-        pic <- draw' ctx state''
+        pic <- draw' state''
         render ctx pic
         now <- getCurrentTime
         let td = diffUTCTime now stamp
@@ -151,11 +184,3 @@ playIO fps (x,y) initialState draw' {-rename draw to render-} handleInput step =
         loop state''
       in
         loop initialState
-
-canvasHtml :: Int -> Int -> String
-canvasHtml x y = "<canvas id=\"canvas\" \
-             \width=\""++ show x ++ "\" \
-             \height=\""++ show y ++ "\" \
-             \style=\"border:1px \
-             \solid #000000;\">\
-             \</canvas> "
