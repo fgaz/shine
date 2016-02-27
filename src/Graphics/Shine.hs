@@ -122,13 +122,13 @@ play :: (IsEventTarget eventElement, IsDocument eventElement)
      -> (Input -> state -> state) -- ^ Input handling function
      -> (Float -> state -> state) -- ^ Stepping function
      -> IO ()
-play ctx doc fps initialState draw' {-rename draw to render-} handleInput step =
+play ctx doc fps initialState draw handleInput step =
   playIO
     ctx
     doc
     fps
     initialState
-    (return . draw')
+    (return . draw)
     (\s i -> return $ handleInput s i)
     (\s t -> return $ step s t)
 
@@ -142,7 +142,7 @@ playIO :: (IsEventTarget eventElement, IsDocument eventElement)
        -> (Input -> state -> IO state) -- ^ Input handling function
        -> (Float -> state -> IO state) -- ^ Stepping function
        -> IO ()
-playIO ctx doc fps initialState draw' {-rename draw to render-} handleInput step = do
+playIO ctx doc fps initialState draw handleInput step = do
     inputM <- newMVar []
     _ <- on doc mouseDown $ do
         btn <- fmap toMouseBtn mouseButton
@@ -175,7 +175,7 @@ playIO ctx doc fps initialState draw' {-rename draw to render-} handleInput step
         state'' <- step (1/fps) state' --MAYBE change 1/fps to actual td
         clearRect ctx (-10000) (-10000) 20000 20000 --FIXME
         setTransform ctx 1 0 0 1 0 0 -- reset transforms (and accumulated errors!).
-        pic <- draw' state''
+        pic <- draw state''
         render ctx pic
         now <- getCurrentTime
         let td = diffUTCTime now stamp
