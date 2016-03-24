@@ -44,11 +44,28 @@ concentricCircles = foldMap Circle [1,10..100]
 
 ### Drawing `Picture`s
 
-To render a `Picture` on a canvas you have three options:
+Before drawing anything you need to obtain a `RenderingContext2D`.
+For this purpose, shine provides two utility functions: `fullScreenCanvas` and `fixedSizeCanvas`
+
+```haskell
+main :: IO ()
+main = runWebGUI $ \ webView -> do
+    ctx <- fixedSizeCanvas webView 800 600
+    -- do something with ctx
+```
+
+To render a `Picture` on a context you have three options:
 
 #### `render`
 
 You can draw it manually using `render` from `Graphics.Shine.Render`
+
+```haskell
+main :: IO ()
+main = runWebGUI $ \ webView -> do
+    ctx <- fixedSizeCanvas webView 400 400
+    draw ctx concentricCircles
+```
 
 #### `animate`
 
