@@ -14,10 +14,10 @@ You'll need [ghcjs](https://github.com/ghcjs/ghcjs)
 
 ### `Picture`s
 
-To draw something you have to build a tree representing your drawing using
-the `Picture` datatype.
+To represent your drawing you have to build a tree using the `Picture` datatype.
 
 ```haskell
+pic :: Picture
 pic = Rect 10 20 -- represents a 10x20 square
 ```
 
@@ -28,15 +28,17 @@ and overlaps them.
 
 ```haskell
 -- draw some shapes on top of each other
+pic :: Picture
 pic = Rect 10 20
    <> Translate 30 30 (Circle 15)
    <> Colored (Color 255 0 0 0.2) (RectF 4 4)
    <> Text "Sans 12px" LeftAlign 200 "The quick brown fox jumps over the lazy dog."
 ```
 
-Using `Foldable`s you can do things like
+Using `Foldable` you can do things like
 
 ```haskell
+concentricCircles :: Picture
 concentricCircles = foldMap Circle [1,10..100]
 ```
 
