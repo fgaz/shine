@@ -8,7 +8,7 @@ Heavily inspired by [gloss](http://gloss.ouroborus.net/).
 
 ## Compiling
 
-You'll need [ghcjs](https://github.com/ghcjs/ghcjs)
+You need [ghcjs](https://github.com/ghcjs/ghcjs)
 
 ## Usage
 
