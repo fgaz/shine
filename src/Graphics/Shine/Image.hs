@@ -8,6 +8,7 @@ module Graphics.Shine.Image (
 
 import GHCJS.DOM.HTMLImageElement
 
+-- | Just a wrapper around the HTMLImageElement type. Needed for the Show instance.
 newtype ImageData = ImageData { unImageData :: HTMLImageElement } deriving Eq
 
 -- we need this to show Pictures
