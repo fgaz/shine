@@ -1,16 +1,16 @@
-# Shine <small>(let me know if you think of a better name)</small> - Declarative Graphics for the Web
-
-Heavily inspired by `gloss`
+# Shine - Declarative Graphics for the Web
 
 **Work In Progress!**
 
+Shine wraps javascript's drawing functions in a declarative api.
+
+Heavily inspired by [gloss](http://gloss.ouroborus.net/).
+
 ## Compiling
 
-You'll need [`ghcjs`](https://github.com/ghcjs/ghcjs)
+You'll need [ghcjs](https://github.com/ghcjs/ghcjs)
 
 ## Usage
-
-`shine` wraps javascript's drawing functions in a declarative api.
 
 ### `Picture`s
 
