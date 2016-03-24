@@ -52,8 +52,44 @@ You can draw it manually using `render` from `Graphics.Shine.Render`
 
 #### `animate`
 
-TODO
+You can draw a `Picture` that depends on time. That is, a `Float -> Picture`.
+
+```haskell
+-- An expanding-and-contracting circle.
+animation :: Float -> Picture
+animation = Translate 200 200
+          . Circle
+          . (*100) . (+1) -- bigger positive oscillation
+          . sin -- the circle's radius oscillates
+
+main :: IO ()
+main = runWebGUI $ \ webView -> do
+    ctx <- fixedSizeCanvas webView 400 400
+    animate ctx 30 animation
+```
 
 #### `play`
 
-TODO
+Finally, you can draw a `Picture` that depends on time, inputs
+(keyboard and mouse) and an internal state. This is especially useful for games,
+hence the name.
+
+```haskell
+-- this code draws a black rectangle in the center of the canvas only when the
+-- left mouse button is pressed
+main :: IO ()
+main = runWebGUI $ \ webView -> do
+    ctx <- fixedSizeCanvas webView 400 400
+    Just doc <- webViewGetDomDocument webView
+    play ctx doc 30 initialState draw handleInput step
+  where
+    -- our state represents the state of the left mouse button
+    initialState = Up
+    -- we draw a square only if the button is pressed
+    draw Up = Empty
+    draw Down = Translate 200 200 $ RectF 200 200
+    -- when an event is fired we store the button state
+    handleInput (MouseBtn BtnLeft buttonState _) = const buttonState
+    handleInput _ = id -- catch-all for all other events
+    step _ = id -- our state does not depend on time
+```
