@@ -44,7 +44,7 @@ concentricCircles = foldMap Circle [1,10..100]
 
 ### Drawing `Picture`s
 
-Before drawing anything you need to obtain a `RenderingContext2D`.
+Before drawing anything you need to obtain a `CanvasRenderingContext2D`.
 For this purpose, shine provides two utility functions: `fullScreenCanvas` and `fixedSizeCanvas`
 
 ```haskell
