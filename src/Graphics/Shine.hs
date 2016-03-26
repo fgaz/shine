@@ -87,19 +87,19 @@ animateIO :: CanvasRenderingContext2D -- ^ the context to draw on
           -> (Float -> IO Picture) -- ^ Your drawing function
           -> IO ()
 animateIO ctx fps f = do
-    before <- getCurrentTime
+    initialTime <- getCurrentTime
     let loop = do
         stamp <- getCurrentTime
         clearRect ctx (-10000) (-10000) 20000 20000 --FIXME
         setTransform ctx 1 0 0 1 0 0 -- reset transforms (and accumulated errors!).
-        let t = realToFrac $ diffUTCTime stamp before
+        let t = realToFrac $ diffUTCTime stamp initialTime
         pic <- f t
         render ctx pic
         now <- getCurrentTime
         let td = diffUTCTime now stamp
         when (realToFrac td <= 1 / fps) $
           threadDelay $ floor $ (*1000000) (1 / fps - realToFrac td)
-        loop  --MAYBE change to currentTime - startTime
+        loop
       in
         loop
 
@@ -173,19 +173,21 @@ playIO ctx doc fps initialState draw handleInput step = do
         key <- uiKeyCode
         modifiers <- getModifiersKeyboard
         liftIO $ modifyMVar_ inputM $ fmap return (Keyboard (keyCodeLookup key) Up modifiers :) -- :-) :D XD
-    let loop state = do
-        stamp <- getCurrentTime
+    initialTime <- getCurrentTime
+    let loop state previousTime = do
         inputs <- modifyMVar inputM $ \xs -> return ([], xs)
         state' <- foldrM handleInput state inputs
-        state'' <- step (1/fps) state' --MAYBE change 1/fps to actual td
+        beforeRendering <- getCurrentTime
+        let td = diffUTCTime beforeRendering previousTime
+        state'' <- step (realToFrac td) state'
         clearRect ctx (-10000) (-10000) 20000 20000 --FIXME
         setTransform ctx 1 0 0 1 0 0 -- reset transforms (and accumulated errors!).
         pic <- draw state''
         render ctx pic
-        now <- getCurrentTime
-        let td = diffUTCTime now stamp
-        when (realToFrac td <= 1 / fps) $
-          threadDelay $ floor $ (*1000000) (1 / fps - realToFrac td)
-        loop state''
+        afterRendering <- getCurrentTime --do we really need two timestamps?
+        let renderingTime = diffUTCTime afterRendering beforeRendering
+        when (realToFrac renderingTime <= 1 / fps) $
+          threadDelay $ floor $ (*1000000) (1 / fps - realToFrac renderingTime)
+        loop state'' beforeRendering
       in
-        loop initialState
+        loop initialState initialTime
