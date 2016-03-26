@@ -90,11 +90,16 @@ animateIO ctx fps f = do
     initialTime <- getCurrentTime
     let loop = do
         stamp <- getCurrentTime
+        -- empty the canvas before drawing
+        -- MAYBE we need a buffer canvas on which to draw before copying it
+        -- on the main canvas to avoid blinking
         clearRect ctx (-10000) (-10000) 20000 20000 --FIXME
         setTransform ctx 1 0 0 1 0 0 -- reset transforms (and accumulated errors!).
+        -- get the Picture and draw it
         let t = realToFrac $ diffUTCTime stamp initialTime
         pic <- f t
         render ctx pic
+        -- delay to match the target fps
         now <- getCurrentTime
         let td = diffUTCTime now stamp
         when (realToFrac td <= 1 / fps) $
@@ -148,7 +153,8 @@ playIO :: (IsEventTarget eventElement, IsDocument eventElement)
        -> (Float -> state -> IO state) -- ^ Stepping function
        -> IO ()
 playIO ctx doc fps initialState draw handleInput step = do
-    inputM <- newMVar []
+    inputM <- newMVar [] -- this will accumulate the inputs
+    -- setting up event listeners for mouse and keyboard
     _ <- on doc mouseDown $ do
         btn <- fmap toMouseBtn mouseButton
         modifiers <- getModifiersMouse
@@ -174,17 +180,23 @@ playIO ctx doc fps initialState draw handleInput step = do
         modifiers <- getModifiersKeyboard
         liftIO $ modifyMVar_ inputM $ fmap return (Keyboard (keyCodeLookup key) Up modifiers :) -- :-) :D XD
     initialTime <- getCurrentTime
+    -- main loop
     let loop state previousTime = do
+        -- retrieve inputs and empty inputM
         inputs <- modifyMVar inputM $ \xs -> return ([], xs)
+        -- handle inputs
         state' <- foldrM handleInput state inputs
+        -- state stepping
         beforeRendering <- getCurrentTime
         let td = diffUTCTime beforeRendering previousTime
         state'' <- step (realToFrac td) state'
+        -- actual rendering begins
         clearRect ctx (-10000) (-10000) 20000 20000 --FIXME
         setTransform ctx 1 0 0 1 0 0 -- reset transforms (and accumulated errors!).
         pic <- draw state''
         render ctx pic
         afterRendering <- getCurrentTime --do we really need two timestamps?
+        -- delay to match the target fps
         let renderingTime = diffUTCTime afterRendering beforeRendering
         when (realToFrac renderingTime <= 1 / fps) $
           threadDelay $ floor $ (*1000000) (1 / fps - realToFrac renderingTime)
