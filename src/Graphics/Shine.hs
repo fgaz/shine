@@ -42,36 +42,32 @@ toContext c = do
     ctx <- getContext (unsafeCoerce c) "2d" :: IO JSVal
     return $ unsafeCoerce ctx --how do i get a 2dcontext properly? This works for now.
 
--- | Create a full screen canvas
-fullScreenCanvas :: Window -> IO CanvasRenderingContext2D
-fullScreenCanvas webView = do
+customAttributesCanvas :: Window -> String -> IO CanvasRenderingContext2D
+customAttributesCanvas webView attrs = do
     Just doc <- webViewGetDomDocument webView
     Just body <- getBody doc
     setInnerHTML body $ Just canvasHtml
     Just c <- getElementById doc "canvas"
     toContext c
   where canvasHtml :: String
-        canvasHtml = "<canvas id=\"canvas\" \
-                     \style=\"border:1px \
+        canvasHtml = "<canvas id=\"canvas\" " ++ attrs ++ " </canvas> "
+
+-- | Create a full screen canvas
+fullScreenCanvas :: Window -> IO CanvasRenderingContext2D
+fullScreenCanvas webView = customAttributesCanvas webView attributes
+  where attributes :: String
+        attributes = "style=\"border:1px \
                      \solid #000000; \
-                     \top:0px;bottom:0px;left:0px;right:0px;\">\
-                     \</canvas> "
+                     \top:0px;bottom:0px;left:0px;right:0px;\""
 
 -- | Create a fixed size canvas given the dimensions
 fixedSizeCanvas :: Window -> Int -> Int -> IO CanvasRenderingContext2D
-fixedSizeCanvas webView x y = do
-    Just doc <- webViewGetDomDocument webView
-    Just body <- getBody doc
-    setInnerHTML body (Just $ canvasHtml x y)
-    Just c <- getElementById doc "canvas"
-    toContext c
-  where canvasHtml :: Int -> Int -> String
-        canvasHtml x' y' = "<canvas id=\"canvas\" \
-                           \width=\""++ show x' ++ "\" \
+fixedSizeCanvas webView x y = customAttributesCanvas webView $ attributes x y
+  where attributes :: Int -> Int -> String
+        attributes x' y' = "width=\""++ show x' ++ "\" \
                            \height=\""++ show y' ++ "\" \
                            \style=\"border:1px \
-                           \solid #000000;\">\
-                           \</canvas> "
+                           \solid #000000;\""
 
 -- | Draws a picture which depends only on the time
 animate :: CanvasRenderingContext2D -- ^ the context to draw on
