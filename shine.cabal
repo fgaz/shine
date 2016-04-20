@@ -35,7 +35,8 @@ library
     hs-source-dirs: src
     ghc-options: -O2 -Wall
 
-test-suite test-shine --TODO run this in an actual window
+ --TODO run this in an actual window
+test-suite test-shine
     type:       exitcode-stdio-1.0
     main-is:    everything.hs
     hs-source-dirs: tests
