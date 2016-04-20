@@ -1,3 +1,13 @@
+{-|
+Module      : Graphics.Shine.Input
+Description : Short description
+Copyright   : (c) Francesco Gazzetta, 2016
+License     : MIT
+Maintainer  : francygazz@gmail.com
+Stability   : experimental
+
+Datatypes representing inputs.
+-}
 module Graphics.Shine.Input where
 
 import Web.KeyCode

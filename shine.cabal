@@ -5,14 +5,19 @@ build-type: Simple
 license: MIT
 license-file: LICENSE
 copyright: (c) 2016 Francesco Gazzetta
+author: Francesco Gazzetta
 maintainer: Francesco Gazzetta <francygazz@gmail.com>
 stability: experimental
 homepage: https://github.com/fgaz/shine
 bug-reports: https://github.com/fgaz/shine/issues
 synopsis: Declarative graphics for the browser using GHCJS
-description: A declarative graphics library heavily inspired by `gloss`
+description:
+  Shine wraps javascript's drawing functions in a declarative API.
+  Heavily inspired by Gloss.
+  .
+  Read the README for an overview of the library.
+extra-source-files:  README.md
 category: Web, Graphics
-author: Francesco Gazzetta
 data-dir: ""
 
 source-repository head

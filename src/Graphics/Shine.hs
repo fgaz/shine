@@ -1,3 +1,17 @@
+{-|
+Module      : Graphics.Shine
+Description : Short description
+Copyright   : (c) Francesco Gazzetta, 2016
+License     : MIT
+Maintainer  : francygazz@gmail.com
+Stability   : experimental
+
+The main module. Here are defined all the functions needed to get
+an animation on the screen.
+
+If you want to render a single 'Picture' only once,
+use 'render' from 'Graphics.Shine.Render'
+-}
 module Graphics.Shine (
   -- * Getting a rendering context
   toContext,

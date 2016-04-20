@@ -1,3 +1,14 @@
+{-|
+Module      : Graphics.Shine.Image
+Description : Short description
+Copyright   : (c) Francesco Gazzetta, 2016
+License     : MIT
+Maintainer  : francygazz@gmail.com
+Stability   : experimental
+
+Handling of external image (.png, .svg and all browser-supported formats).
+-}
+
 {-# LANGUAGE ForeignFunctionInterface #-}
 
 module Graphics.Shine.Image (

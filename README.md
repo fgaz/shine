@@ -1,7 +1,5 @@
 # Shine - Declarative Graphics for the Web
 
-**Work In Progress!**
-
 Shine wraps javascript's drawing functions in a declarative API.
 
 Heavily inspired by [gloss](http://gloss.ouroborus.net/).

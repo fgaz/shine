@@ -1,3 +1,14 @@
+{-|
+Module      : Graphics.Shine.Picture
+Description : Short description
+Copyright   : (c) Francesco Gazzetta, 2016
+License     : MIT
+Maintainer  : francygazz@gmail.com
+Stability   : experimental
+
+This module contains the 'Picture' datatype, used to represent the image to draw
+on the canvas, and some functions to operate on it.
+-}
 module Graphics.Shine.Picture (
   Picture (..),
   Color (..),

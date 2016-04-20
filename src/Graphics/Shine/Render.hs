@@ -1,3 +1,13 @@
+{-|
+Module      : Graphics.Shine.Render
+Description : Short description
+Copyright   : (c) Francesco Gazzetta, 2016
+License     : MIT
+Maintainer  : francygazz@gmail.com
+Stability   : experimental
+
+One-shot rendering, mostly used internally.
+-}
 module Graphics.Shine.Render (
   render
 ) where
