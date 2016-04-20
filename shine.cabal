@@ -1,6 +1,6 @@
 name: shine
 version: 0.1.0.0
-cabal-version: >=1.6
+cabal-version: >=1.8
 build-type: Simple
 license: MIT
 license-file: LICENSE
@@ -35,8 +35,8 @@ library
     hs-source-dirs: src
     ghc-options: -O2 -Wall
 
---executable shine-example
---    build-depends: base >=4.2 && <5,
---                   ghcjs-dom >=0.2 && <0.3
---    main-is: Example.hs
---    hs-source-dirs: src
+test-suite test-shine --TODO run this in an actual window
+    type:       exitcode-stdio-1.0
+    main-is:    everything.hs
+    hs-source-dirs: tests
+    build-depends: base, ghcjs-dom, shine
