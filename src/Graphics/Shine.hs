@@ -1,7 +1,9 @@
 module Graphics.Shine (
+  -- * Getting a rendering context
   toContext,
   fullScreenCanvas,
   fixedSizeCanvas,
+  -- * Drawing
   animate,
   animateIO,
   play,
@@ -36,7 +38,7 @@ import Graphics.Shine.Picture
 import Graphics.Shine.Render
 
 -- | Get a context from a canvas element.
-toContext :: Element -- ^ this **must** be a canvas
+toContext :: Element -- ^ this __must__ be a canvas
           -> IO CanvasRenderingContext2D
 toContext c = do
     ctx <- getContext (unsafeCoerce c) "2d" :: IO JSVal
