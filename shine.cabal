@@ -17,7 +17,7 @@ description:
   .
   Read the README for an overview of the library.
 extra-source-files:  README.md
-category: Web, Graphics
+category: Web, Graphics, Javascript
 data-dir: ""
 
 source-repository head
