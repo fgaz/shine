@@ -1,12 +1,11 @@
 import Graphics.Shine
-import Graphics.Shine.Input
 import Graphics.Shine.Image
 import Graphics.Shine.Picture
 
-import GHCJS.DOM (webViewGetDomDocument, runWebGUI)
+import GHCJS.DOM (runWebGUI)
 
-myPic :: ImageData ->  Float -> Picture
-myPic img x =
+animation :: ImageData ->  Float -> Picture
+animation img x =
     Translate (75+x'/2) 15 (RectF (150+x') 30)
     <> Colored (Color 255 0 0 1.0) (Translate 15 (75+x'/2) $ Rect 30 (150+x'))
     <> Colored (Color 200 200 0 1.0) (Translate 660 30 $ RectF 120 60)
@@ -29,25 +28,8 @@ myPic img x =
     <> Translate 600 500 (Text "20px Sans" CenterAlign 300 "The quick brown fox jumps over the lazy dog")
   where x' = sin (x*3) *100 +100
 
-myAnimation :: IO ()
-myAnimation = runWebGUI $ \ webView -> do
+main :: IO ()
+main = runWebGUI $ \ webView -> do
     ctx <- fixedSizeCanvas webView 800 600
     img <- makeImage "httpS://placehold.it/200x70/afa"
-    animate ctx 30 $ myPic img
-
-myGame :: IO ()
-myGame = runWebGUI $ \ webView -> do
-    ctx <- fixedSizeCanvas webView 800 600
-    Just doc <- webViewGetDomDocument webView
-    play ctx doc 30 initialState draw handleInput step
-  where
-    initialState = False
-    draw False = Empty
-    draw True = RectF 300 300
-    handleInput (MouseBtn BtnLeft Down _) = const True
-    handleInput (MouseBtn BtnLeft Up _) = const False
-    handleInput _ = id
-    step _ = id
-
-main :: IO ()
-main = myAnimation --or myGame
+    animate ctx 30 $ animation img
