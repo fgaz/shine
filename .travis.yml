@@ -27,5 +27,5 @@ script:
  - cd reflex-platform
  # horrible, but it works ...for now.
  - nix-shell "$DIR/gc-roots/shell.drv" $NIXOPTS --command "echo \"ENTERING REFLEX NIX ENVIRONMENT\"; cd $repodir; cabal configure --ghcjs && cabal install --ghcjs keycode time mtl transformers"
- - nix-shell "$DIR/gc-roots/shell.drv" $NIXOPTS --command "echo \"ENTERING REFLEX NIX ENVIRONMENT\"; cd $repodir/src && ghcjs ../tests/everything.hs && ghcjs ../tests/simpleInteraction.hs""
+ - nix-shell "$DIR/gc-roots/shell.drv" $NIXOPTS --command "echo \"ENTERING REFLEX NIX ENVIRONMENT\"; cd $repodir/src && ghcjs ../tests/everything.hs && ghcjs ../tests/simpleInteraction.hs"
 
