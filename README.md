@@ -1,5 +1,7 @@
 # Shine - Declarative Graphics for the Web
 
+[![Build Status](https://travis-ci.org/fgaz/shine.svg?branch=master)](https://travis-ci.org/fgaz/shine)
+
 Shine wraps javascript's drawing functions in a declarative API.
 
 Heavily inspired by [gloss](http://gloss.ouroborus.net/).
