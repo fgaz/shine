@@ -1,0 +1,31 @@
+language: nix
+
+sudo: false
+
+cache:
+  directories:
+    - /nix
+
+matrix:
+  include:
+    - addons: {apt: {packages: [curl,git]}}
+
+before_install:
+  - echo test
+
+install:
+ - git clone https://github.com/reflex-frp/reflex-platform
+ - repodir=$PWD
+ - cd reflex-platform
+ - DIR=$(pwd)
+ - echo "" | ./try-reflex || true
+ - . "$DIR/common-setup.sh"
+ - nix-shell "$DIR/gc-roots/shell.drv" $NIXOPTS --command "echo \"ENTERING REFLEX NIX ENVIRONMENT\"; cabal update"
+ - cd $repodir
+
+script:
+ - cd reflex-platform
+ # horrible, but it works ...for now.
+ - nix-shell "$DIR/gc-roots/shell.drv" $NIXOPTS --command "echo \"ENTERING REFLEX NIX ENVIRONMENT\"; cd $repodir; cabal configure --ghcjs && cabal install --ghcjs keycode time mtl transformers"
+ - nix-shell "$DIR/gc-roots/shell.drv" $NIXOPTS --command "echo \"ENTERING REFLEX NIX ENVIRONMENT\"; cd $repodir/src && ghcjs ../tests/everything.hs && ghcjs ../tests/simpleInteraction.hs""
+
