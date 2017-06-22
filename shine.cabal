@@ -31,7 +31,7 @@ library
                      Graphics.Shine.Picture,
                      Graphics.Shine.Render
     build-depends: base >=4.2 && <5,
-                   ghcjs-dom >=0.2 && <0.3,
+                   ghcjs-dom >=0.9 && <0.10,
                    ghcjs-prim,
                    keycode,
                    time,
