@@ -14,6 +14,7 @@ module Graphics.Shine.Render (
 
 import GHCJS.DOM.HTMLImageElement (getWidth, getHeight)
 import GHCJS.DOM.CanvasRenderingContext2D
+import GHCJS.DOM.CanvasPath
 import GHCJS.DOM.Enums (CanvasWindingRule (CanvasWindingRuleNonzero))
 import GHCJS.DOM.Types (CanvasStyle (..))
 
