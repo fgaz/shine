@@ -36,21 +36,21 @@ data Picture =
              -- | The empty picture. Draws nothing.
              Empty
              -- | A rectangle from the dimensions
-             | Rect Float Float
+             | Rect Double Double
              -- | Same thing but filled
              | RectF Float Float
              -- | A line from the coordinates of two points
-             | Line Float Float Float Float
+             | Line Double Double Double Double
              -- | A polygon from a list of vertices
-             | Polygon [(Float, Float)]
+             | Polygon [(Double, Double)]
              -- | An arc from the radius, start angle, end angle.
              -- If the last parameter is True, the direction is counterclockwise
              -- TODO replace with Clockwise | Counterclockwise or remove entirely
-             | Arc Float Float Float Bool
+             | Arc Double Double Double Bool
              -- | A filled circle from the radius
-             | CircleF Float
-             -- | Draws some text. The float is the max width.
-             | Text Font TextAlignment Float String
+             | CircleF Double
+             -- | Draws some text. The 'Maybe' 'Float' is the max width.
+             | Text Font TextAlignment (Maybe Float) String
              -- | Draws an image
              | Image ImageSize ImageData
              -- | Draws the second `Picture` over the first
@@ -67,11 +67,11 @@ data Picture =
              deriving (Eq, Show)
 
 -- | A circle from the center coordinates and radius
-circle :: Float -> Picture
+circle :: Double -> Picture
 circle r = Arc r 0 (2*3.14) False
 
 -- | Shorthand to draw a series of lines
-path :: [(Float,Float)] -> Picture
+path :: [(Double, Double)] -> Picture
 path xs = foldMap (\((x,y),(x',y')) -> Line x y x' y') $ zip xs $ tail xs
 
 -- | 'Picture's are 'Monoid's. The identity is an 'Empty' (completely transparent)

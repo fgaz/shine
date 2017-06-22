@@ -41,7 +41,7 @@ render ctx (Polygon ((x,y):pts)) = do
     moveTo ctx x y
     mapM_ (uncurry (lineTo ctx)) pts
     closePath ctx
-    fill ctx CanvasWindingRuleNonzero
+    fill ctx $ Just CanvasWindingRuleNonzero --MAYBE Nothing
 render ctx (Polygon []) = render ctx Empty
 render ctx (Arc r a b direction) = do
     beginPath ctx
@@ -50,8 +50,8 @@ render ctx (Arc r a b direction) = do
 render ctx (CircleF r) = do
     save ctx
     render ctx $ circle r
-    clip ctx CanvasWindingRuleNonzero
-    render ctx $ RectF (r*2) (r*2)
+    clip ctx $ Just CanvasWindingRuleNonzero --MAYBE Nothing
+    render ctx $ RectF (realToFrac (r*2)) (realToFrac (r*2))
     restore ctx
 render ctx (Text font align width txt) = do
     setFont ctx font
@@ -64,16 +64,16 @@ render ctx (Image size (ImageData img)) =
       Original -> do
           x <- ((/(-2)) . realToFrac) <$> getWidth img
           y <- ((/(-2)) . realToFrac) <$> getHeight img
-          drawImage ctx (Just img) x y
+          drawImage ctx img x y
       (Stretched w h) -> do
           let (x, y) = (-w/2, -h/2)
-          drawImageScaled ctx (Just img) x y w h
+          drawImageScaled ctx img x y w h
       (Clipped a b c d) -> do
           let (x, y) = (-c/2, -d/2)
-          drawImagePart ctx (Just img) a b c d x y c d
+          drawImagePart ctx img a b c d x y c d
       (ClippedStretched a b c d e f) -> do
           let (x, y) = (-e/2, -f/2)
-          drawImagePart ctx (Just img) a b c d x y e f
+          drawImagePart ctx img a b c d x y e f
 render ctx (Over a b) = do
     render ctx a
     render ctx b
@@ -102,13 +102,13 @@ render ctx (Colored (Color r g b a) pic) = do
                    ++ intercalate "," [show r, show g, show b, show a]
                    ++ ")"
     let color = toJSString colorString
-    setFillStyle ctx $ Just $ CanvasStyle color
-    setStrokeStyle ctx $ Just $ CanvasStyle color
+    setFillStyle ctx $ CanvasStyle color
+    setStrokeStyle ctx $ CanvasStyle color
     render ctx pic
     -- set the color back to black
     let black = toJSString "#000000"
-    setFillStyle ctx $ Just $ CanvasStyle black
-    setStrokeStyle ctx $ Just $ CanvasStyle black
+    setFillStyle ctx $ CanvasStyle black
+    setStrokeStyle ctx $ CanvasStyle black
 render ctx (Rotate angle pic) = do
     rotate ctx angle
     render ctx pic
@@ -118,3 +118,4 @@ render ctx (Translate x y pic) = do
     translate ctx x y
     render ctx pic
     translate ctx (-x) (-y)
+
