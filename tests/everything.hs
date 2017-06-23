@@ -1,10 +1,21 @@
+{-# LANGUAGE CPP #-}
+
 import Graphics.Shine
 import Graphics.Shine.Image
 import Graphics.Shine.Picture
+import GHCJS.DOM (currentWindowUnchecked)
 
-import GHCJS.DOM (runWebGUI)
 
-animation :: ImageData ->  Float -> Picture
+#if defined(ghcjs_HOST_OS)
+run :: a -> a
+run = id
+#elif defined(MIN_VERSION_jsaddle_wkwebview)
+import Language.Javascript.JSaddle.WKWebView (run)
+#else
+import Language.Javascript.JSaddle.WebKitGTK (run)
+#endif
+
+animation :: ImageData -> Double -> Picture
 animation img x =
     Translate (75+x'/2) 15 (RectF (150+x') 30)
     <> Colored (Color 255 0 0 1.0) (Translate 15 (75+x'/2) $ Rect 30 (150+x'))
@@ -25,11 +36,12 @@ animation img x =
                         , (30,140)
                         , (-120,80)
                         ]))
-    <> Translate 600 500 (Text "20px Sans" CenterAlign 300 "The quick brown fox jumps over the lazy dog")
+    <> Translate 600 500 (Text "20px Sans" CenterAlign (Just 300) "The quick brown fox jumps over the lazy dog")
   where x' = sin (x*3) *100 +100
 
 main :: IO ()
-main = runWebGUI $ \ webView -> do
+main = run $ do
+    webView <- currentWindowUnchecked
     ctx <- fixedSizeCanvas webView 800 600
     img <- makeImage "httpS://placehold.it/200x70/afa"
     animate ctx 30 $ animation img
