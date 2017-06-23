@@ -49,7 +49,7 @@ data Picture =
              | Arc Double Double Double Bool
              -- | A filled circle from the radius
              | CircleF Double
-             -- | Draws some text. The 'Maybe' 'Double' is the max width.
+             -- | Draws some text. The 'Maybe' 'Double' is the optional max width.
              | Text Font TextAlignment (Maybe Double) String
              -- | Draws an image
              | Image ImageSize ImageData
