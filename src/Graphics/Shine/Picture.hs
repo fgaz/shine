@@ -38,7 +38,7 @@ data Picture =
              -- | A rectangle from the dimensions
              | Rect Double Double
              -- | Same thing but filled
-             | RectF Float Float
+             | RectF Double Double
              -- | A line from the coordinates of two points
              | Line Double Double Double Double
              -- | A polygon from a list of vertices
@@ -49,8 +49,8 @@ data Picture =
              | Arc Double Double Double Bool
              -- | A filled circle from the radius
              | CircleF Double
-             -- | Draws some text. The 'Maybe' 'Float' is the max width.
-             | Text Font TextAlignment (Maybe Float) String
+             -- | Draws some text. The 'Maybe' 'Double' is the max width.
+             | Text Font TextAlignment (Maybe Double) String
              -- | Draws an image
              | Image ImageSize ImageData
              -- | Draws the second `Picture` over the first
@@ -60,9 +60,9 @@ data Picture =
              -- color" and override it
              | Colored Color Picture
              -- | Rotates the Picture (in radians)
-             | Rotate Float Picture
+             | Rotate Double Picture
              -- | Moves the Picture by the given x and y distances
-             | Translate Float Float Picture
+             | Translate Double Double Picture
              -- TODO stroke
              deriving (Eq, Show)
 

@@ -35,7 +35,9 @@ render ctx (Line x y x' y') = do
 render ctx (Rect x y) = do
     rect ctx (-x/2) (-y/2) x y
     stroke ctx
-render ctx (RectF x y) = fillRect ctx (-x/2) (-y/2) x y
+render ctx (RectF x' y') = fillRect ctx (-x/2) (-y/2) x y
+  where x = realToFrac x'
+        y = realToFrac y'
 render ctx (Polygon ((x,y):pts)) = do
     beginPath ctx
     moveTo ctx x y
@@ -47,18 +49,20 @@ render ctx (Arc r a b direction) = do
     beginPath ctx
     arc ctx 0 0 r a b direction
     stroke ctx
-render ctx (CircleF r) = do
+render ctx (CircleF r') = do
     save ctx
     render ctx $ circle r
     clip ctx $ Just CanvasWindingRuleNonzero --MAYBE Nothing
-    render ctx $ RectF (realToFrac (r*2)) (realToFrac (r*2))
+    render ctx $ RectF (r*2) (r*2)
     restore ctx
-render ctx (Text font align width txt) = do
+  where r = realToFrac r'
+render ctx (Text font align width' txt) = do
     setFont ctx font
     setTextAlign ctx $ case align of LeftAlign -> "left"
                                      CenterAlign -> "center"
                                      RightAlign -> "rignt"
     fillText ctx txt 0 0 width
+  where width = realToFrac <$> width'
 render ctx (Image size (ImageData img)) =
     case size of
       Original -> do
@@ -109,13 +113,16 @@ render ctx (Colored (Color r g b a) pic) = do
     let black = toJSString "#000000"
     setFillStyle ctx $ CanvasStyle black
     setStrokeStyle ctx $ CanvasStyle black
-render ctx (Rotate angle pic) = do
+render ctx (Rotate angle' pic) = do
     rotate ctx angle
     render ctx pic
     --setTransform ctx 1 0 0 1 0 0 --not ok: prevents Rotate composition
     rotate ctx (-angle)
-render ctx (Translate x y pic) = do
+  where angle = realToFrac angle'
+render ctx (Translate x' y' pic) = do
     translate ctx x y
     render ctx pic
     translate ctx (-x) (-y)
+  where x = realToFrac x'
+        y = realToFrac y'
 
