@@ -105,7 +105,8 @@ animateIO ctx fps f = do
         stamp <- getCurrentTime
         -- empty the canvas before drawing
         -- MAYBE we need a buffer canvas on which to draw before copying it
-        -- on the main canvas to avoid blinking
+        -- on the main canvas (using the bitmaprenderer attribute and
+        -- an OffscreenCanvas for efficiency) to avoid blinking
         clearRect ctx (-10000) (-10000) 20000 20000 --FIXME
         setTransform ctx 1 0 0 1 0 0 -- reset transforms (and accumulated errors!).
         -- get the Picture and draw it
