@@ -46,14 +46,35 @@ concentricCircles = foldMap Circle [1,10..100]
 
 ### Drawing `Picture`s
 
-Before drawing anything you need to obtain a `CanvasRenderingContext2D`.
+Before drawing anything you need to obtain a `CanvasRenderingContext2D` (and sometimes a `Document`).
 For this purpose, shine provides two utility functions: `fullScreenCanvas` and `fixedSizeCanvas`
 
 ```haskell
+{-# LANGUAGE CPP #-}
+
+import Graphics.Shine
+import Graphics.Shine.Input
+import Graphics.Shine.Picture
+
+import GHCJS.DOM (currentDocumentUnchecked)
+
+-- This is how the ghcjs-dom hello-world does it.
+-- It's boilerplate, so in the next shine version there
+-- will probably be a ready-to-use run function
+#if defined(ghcjs_HOST_OS)
+run :: a -> a
+run = id
+#elif defined(MIN_VERSION_jsaddle_wkwebview)
+import Language.Javascript.JSaddle.WKWebView (run)
+#else
+import Language.Javascript.JSaddle.WebKitGTK (run)
+#endif
+
 main :: IO ()
-main = runWebGUI $ \ webView -> do
-    ctx <- fixedSizeCanvas webView 800 600
-    -- do something with ctx
+main = run $ do
+    doc <- currentDocumentUnchecked -- use currentDocument to handle failure
+    ctx <- fixedSizeCanvas doc 400 400
+    -- do something with ctx (and maybe doc)
 ```
 
 To render a `Picture` on a context you have three options:
@@ -64,8 +85,7 @@ You can draw it manually using `render` from `Graphics.Shine.Render`
 
 ```haskell
 main :: IO ()
-main = runWebGUI $ \ webView -> do
-    ctx <- fixedSizeCanvas webView 400 400
+    {- get the context, see before -}
     draw ctx concentricCircles
 ```
 
@@ -82,8 +102,8 @@ animation = Translate 200 200
           . sin -- the circle's radius oscillates
 
 main :: IO ()
-main = runWebGUI $ \ webView -> do
-    ctx <- fixedSizeCanvas webView 400 400
+main =  do
+    {- get the context, see before -}
     animate ctx 30 animation
 ```
 
@@ -97,9 +117,8 @@ hence the name.
 -- this code draws a black rectangle in the center of the canvas only when the
 -- left mouse button is pressed
 main :: IO ()
-main = runWebGUI $ \ webView -> do
-    ctx <- fixedSizeCanvas webView 400 400
-    Just doc <- webViewGetDomDocument webView
+main = do
+    {- get the context and the document, see before -}
     play ctx doc 30 initialState draw handleInput step
   where
     -- our state represents the state of the left mouse button
@@ -112,3 +131,4 @@ main = runWebGUI $ \ webView -> do
     handleInput _ = id -- catch-all for all other events
     step _ = id -- our state does not depend on time
 ```
+
