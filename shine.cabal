@@ -1,10 +1,10 @@
 name: shine
-version: 0.1.0.0
+version: 0.2.0.0
 cabal-version: >=1.8
 build-type: Simple
 license: MIT
 license-file: LICENSE
-copyright: (c) 2016 Francesco Gazzetta
+copyright: (c) 2016-2017 Francesco Gazzetta
 author: Francesco Gazzetta
 maintainer: Francesco Gazzetta <francygazz@gmail.com>
 stability: experimental
@@ -16,7 +16,7 @@ description:
   Heavily inspired by Gloss.
   .
   Read the README for an overview of the library.
-extra-source-files:  README.md
+extra-source-files:  README.md, ChangeLog.md
 category: Web, Graphics, Javascript
 data-dir: ""
 
@@ -33,7 +33,7 @@ library
     build-depends: base >=4.2 && <5,
                    ghcjs-dom >=0.9 && <0.10,
                    ghcjs-prim,
-                   keycode,
+                   keycode >=0.2 && <0.3,
                    time,
                    mtl,
                    transformers
