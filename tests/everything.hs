@@ -3,8 +3,8 @@
 import Graphics.Shine
 import Graphics.Shine.Image
 import Graphics.Shine.Picture
-import GHCJS.DOM (currentWindowUnchecked)
 
+import GHCJS.DOM (currentDocumentUnchecked)
 
 #if defined(ghcjs_HOST_OS)
 run :: a -> a
@@ -41,7 +41,7 @@ animation img x =
 
 main :: IO ()
 main = run $ do
-    webView <- currentWindowUnchecked
-    ctx <- fixedSizeCanvas webView 800 600
+    doc <- currentDocumentUnchecked
+    ctx <- fixedSizeCanvas doc 800 600
     img <- makeImage "httpS://placehold.it/200x70/afa"
     animate ctx 30 $ animation img

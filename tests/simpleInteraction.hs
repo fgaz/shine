@@ -4,7 +4,7 @@ import Graphics.Shine
 import Graphics.Shine.Input
 import Graphics.Shine.Picture
 
-import GHCJS.DOM (currentWindowUnchecked, currentDocument)
+import GHCJS.DOM (currentDocumentUnchecked)
 
 #if defined(ghcjs_HOST_OS)
 run :: a -> a
@@ -17,9 +17,8 @@ import Language.Javascript.JSaddle.WebKitGTK (run)
 
 main :: IO ()
 main = run $ do
-    webView <- currentWindowUnchecked
-    ctx <- fixedSizeCanvas webView 800 600
-    Just doc <- currentDocument
+    doc <- currentDocumentUnchecked
+    ctx <- fixedSizeCanvas doc 800 600
     play ctx doc 30 initialState draw handleInput step
   where
     initialState = False

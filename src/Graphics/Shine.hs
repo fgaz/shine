@@ -24,7 +24,6 @@ module Graphics.Shine (
   playIO
 ) where
 
-import GHCJS.DOM.Window (getDocument)
 import GHCJS.DOM.Document (getBody)
 import GHCJS.DOM.NonElementParentNode (getElementById)
 import GHCJS.DOM.EventM (on, mouseButton, mouseCtrlKey, mouseAltKey, mouseShiftKey, mouseMetaKey, mouseOffsetXY, uiKeyCode, event)
@@ -35,7 +34,7 @@ import GHCJS.DOM.KeyboardEvent (KeyboardEvent, getCtrlKey, getShiftKey, getAltKe
 import GHCJS.DOM.Element (setInnerHTML)
 import GHCJS.DOM.HTMLCanvasElement (getContext)
 import GHCJS.DOM.CanvasRenderingContext2D
-import GHCJS.DOM.Types (JSM, Window, Element, MouseEvent, IsDocument)
+import GHCJS.DOM.Types (JSM, Element, MouseEvent, IsDocument, Document)
 
 import Web.KeyCode (keyCodeLookup)
 import Unsafe.Coerce (unsafeCoerce)
@@ -59,9 +58,8 @@ toContext c = do
     Just ctx <- getContext (unsafeCoerce c) "2d" ["2d"]
     return $ unsafeCoerce ctx --how do i get a 2dcontext properly? This works for now.
 
-customAttributesCanvas :: Window -> String -> JSM CanvasRenderingContext2D
-customAttributesCanvas webView attrs = do
-    doc <- getDocument webView
+customAttributesCanvas :: Document -> String -> JSM CanvasRenderingContext2D
+customAttributesCanvas doc attrs = do
     Just body <- getBody doc
     setInnerHTML body $ Just canvasHtml
     Just c <- getElementById doc "canvas"
@@ -70,16 +68,16 @@ customAttributesCanvas webView attrs = do
         canvasHtml = "<canvas id=\"canvas\" " ++ attrs ++ " </canvas> "
 
 -- | Create a full screen canvas
-fullScreenCanvas :: Window -> JSM CanvasRenderingContext2D
-fullScreenCanvas webView = customAttributesCanvas webView attributes
+fullScreenCanvas :: Document -> JSM CanvasRenderingContext2D
+fullScreenCanvas doc = customAttributesCanvas doc attributes
   where attributes :: String
         attributes = "style=\"border:1px \
                      \solid #000000; \
                      \top:0px;bottom:0px;left:0px;right:0px;\""
 
 -- | Create a fixed size canvas given the dimensions
-fixedSizeCanvas :: Window -> Int -> Int -> JSM CanvasRenderingContext2D
-fixedSizeCanvas webView x y = customAttributesCanvas webView $ attributes x y
+fixedSizeCanvas :: Document -> Int -> Int -> JSM CanvasRenderingContext2D
+fixedSizeCanvas doc x y = customAttributesCanvas doc $ attributes x y
   where attributes :: Int -> Int -> String
         attributes x' y' = "width=\""++ show x' ++ "\" \
                            \height=\""++ show y' ++ "\" \
