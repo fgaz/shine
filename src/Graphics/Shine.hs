@@ -24,18 +24,19 @@ module Graphics.Shine (
   playIO
 ) where
 
-import GHCJS.DOM (webViewGetDomDocument)
-import GHCJS.DOM.Document (getBody, getElementById, mouseUp, mouseDown, mouseMove, wheel, keyDown, keyUp)
+import GHCJS.DOM.Window (getDocument)
+import GHCJS.DOM.Document (getBody)
+import GHCJS.DOM.NonElementParentNode (getElementById)
 import GHCJS.DOM.EventM (on, mouseButton, mouseCtrlKey, mouseAltKey, mouseShiftKey, mouseMetaKey, mouseOffsetXY, uiKeyCode, event)
+import GHCJS.DOM.GlobalEventHandlers (mouseDown, mouseUp, mouseMove, wheel, keyUp, keyDown)
 import GHCJS.DOM.EventTarget (IsEventTarget)
 import GHCJS.DOM.WheelEvent (getDeltaX, getDeltaY)
 import GHCJS.DOM.KeyboardEvent (KeyboardEvent, getCtrlKey, getShiftKey, getAltKey, getMetaKey)
 import GHCJS.DOM.Element (setInnerHTML)
 import GHCJS.DOM.HTMLCanvasElement (getContext)
 import GHCJS.DOM.CanvasRenderingContext2D
-import GHCJS.DOM.Types (Window, Element, MouseEvent, IsDocument)
+import GHCJS.DOM.Types (JSM, Window, Element, MouseEvent, IsDocument)
 
-import GHCJS.Prim (JSVal)
 import Web.KeyCode (keyCodeLookup)
 import Unsafe.Coerce (unsafeCoerce)
 import Control.Concurrent (threadDelay)
@@ -53,14 +54,14 @@ import Graphics.Shine.Render
 
 -- | Get a context from a canvas element.
 toContext :: Element -- ^ this __must__ be a canvas
-          -> IO CanvasRenderingContext2D
+          -> JSM CanvasRenderingContext2D
 toContext c = do
-    ctx <- getContext (unsafeCoerce c) "2d" :: IO JSVal
+    Just ctx <- getContext (unsafeCoerce c) "2d" ["2d"]
     return $ unsafeCoerce ctx --how do i get a 2dcontext properly? This works for now.
 
-customAttributesCanvas :: Window -> String -> IO CanvasRenderingContext2D
+customAttributesCanvas :: Window -> String -> JSM CanvasRenderingContext2D
 customAttributesCanvas webView attrs = do
-    Just doc <- webViewGetDomDocument webView
+    doc <- getDocument webView
     Just body <- getBody doc
     setInnerHTML body $ Just canvasHtml
     Just c <- getElementById doc "canvas"
@@ -69,7 +70,7 @@ customAttributesCanvas webView attrs = do
         canvasHtml = "<canvas id=\"canvas\" " ++ attrs ++ " </canvas> "
 
 -- | Create a full screen canvas
-fullScreenCanvas :: Window -> IO CanvasRenderingContext2D
+fullScreenCanvas :: Window -> JSM CanvasRenderingContext2D
 fullScreenCanvas webView = customAttributesCanvas webView attributes
   where attributes :: String
         attributes = "style=\"border:1px \
@@ -77,7 +78,7 @@ fullScreenCanvas webView = customAttributesCanvas webView attributes
                      \top:0px;bottom:0px;left:0px;right:0px;\""
 
 -- | Create a fixed size canvas given the dimensions
-fixedSizeCanvas :: Window -> Int -> Int -> IO CanvasRenderingContext2D
+fixedSizeCanvas :: Window -> Int -> Int -> JSM CanvasRenderingContext2D
 fixedSizeCanvas webView x y = customAttributesCanvas webView $ attributes x y
   where attributes :: Int -> Int -> String
         attributes x' y' = "width=\""++ show x' ++ "\" \
@@ -87,17 +88,17 @@ fixedSizeCanvas webView x y = customAttributesCanvas webView $ attributes x y
 
 -- | Draws a picture which depends only on the time
 animate :: CanvasRenderingContext2D -- ^ the context to draw on
-        -> Float -- ^ FPS
-        -> (Float -> Picture) -- ^ Your drawing function
-        -> IO ()
+        -> Double -- ^ FPS
+        -> (Double -> Picture) -- ^ Your drawing function
+        -> JSM ()
 animate ctx fps f = animateIO ctx fps $ return . f
 
 -- | Draws a picture which depends only on the time... and everything else,
 -- since you can do I/O.
 animateIO :: CanvasRenderingContext2D -- ^ the context to draw on
-          -> Float -- ^ FPS
-          -> (Float -> IO Picture) -- ^ Your drawing function
-          -> IO ()
+          -> Double -- ^ FPS
+          -> (Double -> IO Picture) -- ^ Your drawing function
+          -> JSM ()
 animateIO ctx fps f = do
     initialTime <- getCurrentTime
     let loop = do
@@ -120,14 +121,14 @@ animateIO ctx fps f = do
       in
         loop
 
-getModifiersMouse :: ReaderT MouseEvent IO Modifiers
+getModifiersMouse :: ReaderT MouseEvent JSM Modifiers
 getModifiersMouse = Modifiers
                    <$> fmap toKeyState mouseCtrlKey
                    <*> fmap toKeyState mouseAltKey
                    <*> fmap toKeyState mouseShiftKey
                    <*> fmap toKeyState mouseMetaKey
 
-getModifiersKeyboard :: ReaderT KeyboardEvent IO Modifiers
+getModifiersKeyboard :: ReaderT KeyboardEvent JSM Modifiers
 getModifiersKeyboard = Modifiers
                    <$> fmap toKeyState (event >>= getCtrlKey)
                    <*> fmap toKeyState (event >>= getAltKey)
@@ -138,12 +139,12 @@ getModifiersKeyboard = Modifiers
 play :: (IsEventTarget eventElement, IsDocument eventElement)
      => CanvasRenderingContext2D -- ^ the context to draw on
      -> eventElement
-     -> Float -- ^ FPS
+     -> Double -- ^ FPS
      -> state -- ^ Initial state
      -> (state -> Picture) -- ^ Drawing function
      -> (Input -> state -> state) -- ^ Input handling function
-     -> (Float -> state -> state) -- ^ Stepping function
-     -> IO ()
+     -> (Double -> state -> state) -- ^ Stepping function
+     -> JSM ()
 play ctx doc fps initialState draw handleInput step =
   playIO
     ctx
@@ -158,12 +159,12 @@ play ctx doc fps initialState draw handleInput step =
 playIO :: (IsEventTarget eventElement, IsDocument eventElement)
        => CanvasRenderingContext2D -- ^ the context to draw on
        -> eventElement
-       -> Float -- ^ FPS
+       -> Double -- ^ FPS
        -> state -- ^ Initial state
        -> (state -> IO Picture) -- ^ Drawing function
        -> (Input -> state -> IO state) -- ^ Input handling function
-       -> (Float -> state -> IO state) -- ^ Stepping function
-       -> IO ()
+       -> (Double -> state -> IO state) -- ^ Stepping function
+       -> JSM ()
 playIO ctx doc fps initialState draw handleInput step = do
     inputM <- newMVar [] -- this will accumulate the inputs
     -- setting up event listeners for mouse and keyboard
@@ -186,11 +187,11 @@ playIO ctx doc fps initialState draw handleInput step = do
     _ <- on doc keyDown $ do
         key <- uiKeyCode
         modifiers <- getModifiersKeyboard
-        liftIO $ modifyMVar_ inputM $ fmap return (Keyboard (keyCodeLookup key) Down modifiers :) -- :-) :D XD
+        liftIO $ modifyMVar_ inputM $ fmap return (Keyboard (keyCodeLookup $ fromIntegral key) Down modifiers :) -- :-) :D XD
     _ <- on doc keyUp $ do
         key <- uiKeyCode
         modifiers <- getModifiersKeyboard
-        liftIO $ modifyMVar_ inputM $ fmap return (Keyboard (keyCodeLookup key) Up modifiers :) -- :-) :D XD
+        liftIO $ modifyMVar_ inputM $ fmap return (Keyboard (keyCodeLookup $ fromIntegral key) Up modifiers :) -- :-) :D XD
     initialTime <- getCurrentTime
     -- main loop
     let loop state previousTime = do
@@ -215,3 +216,4 @@ playIO ctx doc fps initialState draw handleInput step = do
         loop state'' beforeRendering
       in
         loop initialState initialTime
+

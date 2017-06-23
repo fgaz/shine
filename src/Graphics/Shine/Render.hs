@@ -16,7 +16,7 @@ import GHCJS.DOM.HTMLImageElement (getWidth, getHeight)
 import GHCJS.DOM.CanvasRenderingContext2D
 import GHCJS.DOM.CanvasPath
 import GHCJS.DOM.Enums (CanvasWindingRule (CanvasWindingRuleNonzero))
-import GHCJS.DOM.Types (CanvasStyle (..))
+import GHCJS.DOM.Types (JSM, CanvasStyle (..))
 
 import GHCJS.Prim (toJSString)
 import Data.List (intercalate)
@@ -26,7 +26,7 @@ import Graphics.Shine.Image
 
 
 -- | Renders a picture on a 2D context.
-render :: CanvasRenderingContext2D -> Picture -> IO ()
+render :: CanvasRenderingContext2D -> Picture -> JSM ()
 render _ Empty = return ()
 render ctx (Line x y x' y') = do
     moveTo ctx x y
