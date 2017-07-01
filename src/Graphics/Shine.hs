@@ -61,7 +61,7 @@ toContext c = do
 customAttributesCanvas :: Document -> String -> JSM CanvasRenderingContext2D
 customAttributesCanvas doc attrs = do
     Just body <- getBody doc
-    setInnerHTML body $ Just canvasHtml
+    setInnerHTML body canvasHtml
     Just c <- getElementById doc "canvas"
     toContext c
   where canvasHtml :: String
