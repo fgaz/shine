@@ -6,7 +6,7 @@ Shine wraps javascript's drawing functions in a declarative API.
 
 Heavily inspired by [gloss](http://gloss.ouroborus.net/).
 
-**demo** (compiled tests) [here](http://fgaz.me/shine/tests)
+**demo** (compiled tests) [here](http://fgaz.github.io/shine/tests)
 
 ## Compiling
 
