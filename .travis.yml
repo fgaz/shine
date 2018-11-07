@@ -15,7 +15,8 @@ before_install:
 
 install:
  - git clone https://github.com/reflex-frp/reflex-platform
- - echo "" | ./reflex-platform/scripts/work-on ghcjs ./. --run "echo Prepared environment"
+ - echo "" | ./reflex-platform/scripts/setup
+ - ./reflex-platform/scripts/work-on ghcjs ./. --run "echo Prepared environment"
 
 script:
  - ./reflex-platform/scripts/work-on ghcjs ./. --run "cabal new-build all"
