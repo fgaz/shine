@@ -74,9 +74,15 @@ circle r = Arc r 0 (2*3.14) False
 path :: [(Double, Double)] -> Picture
 path xs = foldMap (\((x,y),(x',y')) -> Line x y x' y') $ zip xs $ tail xs
 
+-- | 'Picture's are 'Semigroup's. The composing function is the overlapping
+-- (the right picture is drawn over the left one).
+instance Semigroup Picture where
+    (<>) = Over
+
 -- | 'Picture's are 'Monoid's. The identity is an 'Empty' (completely transparent)
 -- picture and the composing function is the overlapping (the right picture is
 -- drawn over the left one).
 instance Monoid Picture where
     mempty = Empty
     mappend = Over
+
