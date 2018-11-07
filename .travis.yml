@@ -19,5 +19,5 @@ install:
  - ./reflex-platform/scripts/work-on ghcjs ./. --run "echo Prepared environment"
 
 script:
- - ./reflex-platform/scripts/work-on ghcjs ./. --run "cabal new-build all"
+ - ./reflex-platform/scripts/work-on ghcjs ./. --run "cabal new-build --ghcjs all"
 
