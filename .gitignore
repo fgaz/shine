@@ -1,4 +1,6 @@
 dist/
+dist-newstyle
+.ghc.environment.*
 *.js_hi
 *.js_o
 *.jsexe
