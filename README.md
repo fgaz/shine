@@ -12,6 +12,9 @@ Heavily inspired by [gloss](http://gloss.ouroborus.net/).
 
 You need [ghcjs](https://github.com/ghcjs/ghcjs)
 
+A great way of building ghcjs packages is to use the
+[reflex platform](https://github.com/reflex-frp/reflex-platform)
+
 ## Usage
 
 ### `Picture`s
