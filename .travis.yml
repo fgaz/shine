@@ -19,7 +19,7 @@ install:
  - cd reflex-platform
  - DIR=$(pwd)
  - echo "" | ./try-reflex || true
- - . "$DIR/common-setup.sh"
+ - . "$DIR/scripts/common-setup.sh"
  - nix-shell "$DIR/gc-roots/shell.drv" $NIXOPTS --command "echo \"ENTERING REFLEX NIX ENVIRONMENT\"; cabal update"
  - cd $repodir
 
