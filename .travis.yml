@@ -6,9 +6,6 @@ matrix:
   include:
     - addons: {apt: {packages: [curl,git]}}
 
-before_install:
-  - echo test
-
 install:
  - git clone https://github.com/reflex-frp/reflex-platform
  - echo "" | ./reflex-platform/scripts/setup
