@@ -88,8 +88,8 @@ You can draw it manually using `render` from `Graphics.Shine.Render`
 
 ```haskell
 main :: IO ()
-    {- get the context, see before -}
-    draw ctx concentricCircles
+    {- omitted: get the context, see before -}
+    render ctx concentricCircles
 ```
 
 #### `animate`
@@ -106,7 +106,7 @@ animation = Translate 200 200
 
 main :: IO ()
 main =  do
-    {- get the context, see before -}
+    {- omitted: get the context, see before -}
     animate ctx 30 animation
 ```
 
@@ -121,7 +121,7 @@ hence the name.
 -- left mouse button is pressed
 main :: IO ()
 main = do
-    {- get the context and the document, see before -}
+    {- omitted: get the context and the document, see before -}
     play ctx doc 30 initialState draw handleInput step
   where
     -- our state represents the state of the left mouse button
