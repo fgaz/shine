@@ -6,10 +6,24 @@ license:            MIT
 
 executable shine-spaceinvaders
     main-is:            Main.hs
-    other-modules:      Game, Point
+    other-modules:      Game Point
     hs-source-dirs:     spaceinvaders
     default-language:   Haskell2010
-    ghc-options:        -O2 -threaded -rtsopts -with-rtsopts=-N -Wall -Wno-unused-top-binds
+    ghc-options:        -O2 -threaded -rtsopts -with-rtsopts=-N -Wall
+                        -Wno-unused-top-binds -Wno-missing-home-modules
+    ghcjs-options:      -dedupe
+    cpp-options:        -DGHCJS_BROWSER
+    build-depends:      base, containers, ghcjs-dom, keycode, random, shine
+    if !impl(ghcjs)
+        buildable:      False
+
+executable shine-mountaincar
+    main-is:            Main.hs
+    other-modules:      Game MountainCar Point
+    hs-source-dirs:     mountaincar
+    default-language:   Haskell2010
+    ghc-options:        -O2 -threaded -rtsopts -with-rtsopts=-N -Wall 
+                        -Wno-unused-top-binds -Wno-missing-signatures -Wno-missing-home-modules
     ghcjs-options:      -dedupe
     cpp-options:        -DGHCJS_BROWSER
     build-depends:      base, containers, ghcjs-dom, keycode, random, shine
