@@ -2,6 +2,7 @@ module Game where
 
 import qualified MountainCar as MC
 
+maxStep :: Int
 maxStep = 200
 
 data Game = Game
