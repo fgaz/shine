@@ -10,14 +10,31 @@ import qualified Web.KeyCode as W
 import System.Random (newStdGen, randoms)
 import GHCJS.DOM (currentDocumentUnchecked)
 
-gameWidth = 800 :: Double
-gameHeight = 600 :: Double
+gameWidth :: Double
+gameWidth = 800
+
+gameHeight :: Double
+gameHeight = 600
+
+fps :: Double
 fps = 30
+
+minSpaceX :: Double
 minSpaceX = MC.minPosition - 0.1
+
+maxSpaceX :: Double
 maxSpaceX = MC.maxPosition + 0.1
+
+minSpaceY :: Double
 minSpaceY = 0
+
+maxSpaceY :: Double
 maxSpaceY = 1.1
+
+goalSpaceX :: Double
 goalSpaceX = 0.5
+
+goalSpaceY :: Double
 goalSpaceY = MC.heightObs goalSpaceX
 
 displayH :: G.Game -> S.Picture
@@ -56,6 +73,8 @@ eventH _ g = g
 
 idleH :: Double -> G.Game -> G.Game
 idleH _ = G.step
+-- The mountain car problem is generally defined using a fixed time step,
+-- so we ignore the time delta and just compute the next step.
 
 main :: IO ()
 main = do

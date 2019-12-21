@@ -1,12 +1,27 @@
 module MountainCar where
 
+minPosition :: Double
 minPosition = -1.2
+
+maxPosition :: Double
 maxPosition = 0.6
+
+minInitPos :: Double
 minInitPos = -0.6
+
+maxInitPos :: Double
 maxInitPos = -0.4
+
+maxSpeed :: Double
 maxSpeed = 0.07
+
+goalPosition :: Double
 goalPosition = 0.5
+
+force :: Double
 force = 0.001
+
+gravity :: Double
 gravity = 0.0025
 
 data Action = ActionLeft | ActionNothing | ActionRight
