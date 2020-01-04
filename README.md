@@ -140,3 +140,23 @@ main = do
 See the [`shine-examples`](./shine-examples) package
 ([Hackage](https://hackage.haskell.org/package/shine-examples)).
 
+### Handling assets
+
+Handling assets with ghcjs and the browser is somewhat tricky.
+
+The usual way of doing it for normal haskell programs is to use
+[`data-files`](https://www.haskell.org/cabal/users-guide/developing-packages.html#pkg-field-data-files).
+Unfortunately, this work by either hardcoding an absolute path in the executable,
+which will not work when the program is put on a server in a different path,
+or with an environment variable override (`$pkgname_datadir`),
+which will not work because
+[environment variables do not exist in the browser](https://github.com/ghcjs/shims/blob/de9560ee1fb8d1ca58c12da20c71a778eb08f3db/src/environment.js#L155).
+
+So, for now, the solution is to explicitly specify absolute or relative paths
+in the source code, and then to manyully copy the assets to the appropriate
+location after building/deploying the code.
+This is what I did in the `animated-shapes` demo for the peppers image.
+
+Relevant cabal ticket, discussing a possible new way of handling assets:
+https://github.com/haskell/cabal/issues/6096#issuecomment-570784857
+

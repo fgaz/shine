@@ -27,7 +27,6 @@ animation img x =
     <> Colored (Color 255 0 0 1.0) (Translate 800 500 $ CircleF (x'/10))
     <> foldMap (Translate 300 300 . circle) [1,5..x']
     <> Translate 350 350 (Rotate (x'/200) $ RectF 150 30)
-    <> Translate 100 500 (Image Original img)
     <> Colored (Color 0 0 255 1) -- blue pentagon
            (Translate 200 500
                (Polygon [ (-110,-80)
@@ -36,6 +35,7 @@ animation img x =
                         , (30,140)
                         , (-120,80)
                         ]))
+    <> Translate 100 500 (Image Original img)
     <> Translate 600 500 (Text "20px Sans" CenterAlign (Just 300) "The quick brown fox jumps over the lazy dog")
   where x' = sin (x*3) *100 +100
 
@@ -43,5 +43,8 @@ main :: IO ()
 main = run $ do
     doc <- currentDocumentUnchecked
     ctx <- fixedSizeCanvas doc 800 600
-    img <- makeImage "httpS://placehold.it/200x70/afa"
+    -- Handling assets is somewhat tricky.
+    -- See the "handling assets" section in the shine README.
+    img <- makeImage "./image.png"
     animate ctx 30 $ animation img
+

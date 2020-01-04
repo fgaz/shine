@@ -15,6 +15,9 @@ A great way of building ghcjs packages is to use the
 
 A lot of different shapes, some of them changing color, size and other properties with time.
 
+Note: it will not work without manually copying `image.png` next to the `index.html` file.
+See the "handling assets" section in the shine README for more info.
+
 ### simple-interaction
 
 An extremely simple user interaction: a black square appears on left mouse down and disappears on mouse up.

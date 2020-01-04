@@ -3,7 +3,9 @@ version:            0.1
 build-type:         Simple
 cabal-version:      >=1.10
 license:            MIT
+extra-source-files: README.md
 
+-- See the README for additional instructions on how to run animated-shapes
 executable animated-shapes
     main-is:            Main.hs
     hs-source-dirs:     animated-shapes
