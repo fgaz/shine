@@ -4,6 +4,28 @@ build-type:         Simple
 cabal-version:      >=1.10
 license:            MIT
 
+executable animated-shapes
+    main-is:            Main.hs
+    hs-source-dirs:     animated-shapes
+    default-language:   Haskell2010
+    ghc-options:        -threaded -Wall -Wno-missing-home-modules
+    ghcjs-options:      -dedupe
+    cpp-options:        -DGHCJS_BROWSER
+    build-depends:      base, ghcjs-dom, shine
+    if !impl(ghcjs)
+        buildable:      False
+
+executable simple-interaction
+    main-is:            Main.hs
+    hs-source-dirs:     simple-interaction
+    default-language:   Haskell2010
+    ghc-options:        -threaded -Wall -Wno-missing-home-modules
+    ghcjs-options:      -dedupe
+    cpp-options:        -DGHCJS_BROWSER
+    build-depends:      base, ghcjs-dom, shine
+    if !impl(ghcjs)
+        buildable:      False
+
 executable spaceinvaders
     main-is:            Main.hs
     other-modules:      Game Point

@@ -40,15 +40,3 @@ library
     hs-source-dirs: src
     ghc-options: -O2 -Wall
 
- --TODO run this in an actual window
-test-suite test-shine-animateeverything
-    type:       exitcode-stdio-1.0
-    main-is:    everything.hs
-    hs-source-dirs: tests
-    build-depends: base, ghcjs-dom, shine
-
-test-suite test-shine-simpleinteraction
-    type:       exitcode-stdio-1.0
-    main-is:    simpleInteraction.hs
-    hs-source-dirs: tests
-    build-depends: base, ghcjs-dom, shine
