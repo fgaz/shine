@@ -1,0 +1,131 @@
+code size summary per package:
+
+base:                    350781
+containers-0.6.0.1-BAqcfV1UBBeCIRjPbUYeSG:28242
+ghc-prim:                22410
+ghcjs-base-0.2.0.0-e382e3a14d1a9370cb61b6ae06b235f541f0c13c5e79b6f3de4b124166137e6a:1119
+ghcjs-dom-jsffi-0.9.4.0-55b1cddef78a2eab77fbba45194ec9cbae7dae2f2dfaa86009772734e886bc17:11196
+ghcjs-prim-0.1.1.0-EXzjGVHQlAS2XAXcu0iCbS:4274
+integer-gmp:             69354
+keycode-0.2.2-730cdc84e7e48c19d859dd2c1cef53ada1dd03e8ce92a22b4bee9dd14625c3bc:19515
+main:                    12902
+random-1.1-8d96efdfc0e58ac1d08980258ced60eaa3e93d2f0c73bca715b218ab77b0fe38:37585
+shine-0.2.0.3-inplace:   20172
+time-1.8.0.2-3d3i5aGvKEfEHwUSNgliL4:46862
+
+
+code size per module:
+
+base
+    Control.Exception.Base:             1
+    Data.Fixed:                         142
+    Data.Maybe:                         600
+    Data.OldList:                       46055
+    Data.Typeable.Internal:             9808
+    Foreign.C.Error:                    873
+    Foreign.Marshal.Alloc:              2735
+    Foreign.Storable:                   2490
+    GHC.Arr:                            3678
+    GHC.Base:                           2138
+    GHC.Conc.Sync:                      144
+    GHC.Enum:                           132
+    GHC.Err:                            7879
+    GHC.Exception:                      2483
+    GHC.Exception.Type:                 5574
+    GHC.Fingerprint:                    546
+    GHC.Fingerprint.Type:               67020
+    GHC.Float:                          10831
+    GHC.Foreign:                        585
+    GHC.ForeignPtr:                     1501
+    GHC.IO:                             737
+    GHC.IO.Buffer:                      1
+    GHC.IO.BufferedIO:                  539
+    GHC.IO.Device:                      399
+    GHC.IO.Encoding:                    592
+    GHC.IO.Encoding.Failure:            1
+    GHC.IO.Encoding.Types:              57916
+    GHC.IO.Encoding.UTF8:               11259
+    GHC.IO.Exception:                   26274
+    GHC.IO.FD:                          274
+    GHC.IO.Handle:                      5123
+    GHC.IO.Handle.FD:                   23529
+    GHC.IO.Handle.Internals:            1838
+    GHC.IO.Handle.Types:                10152
+    GHC.Int:                            5628
+    GHC.List:                           1
+    GHC.MVar:                           113
+    GHC.Maybe:                          105
+    GHC.Num:                            113
+    GHC.Ptr:                            3005
+    GHC.Real:                           1
+    GHC.STRef:                          5279
+    GHC.Show:                           3999
+    GHC.Stack.CCS:                      488
+    GHC.Stack.Types:                    9761
+    GHC.TopHandler:                     1
+    GHC.Word:                           1128
+    System.CPUTime:                     304
+    System.CPUTime.Unsupported:         13395
+    System.Posix.Internals:             3611
+
+containers-0.6.0.1-BAqcfV1UBBeCIRjPbUYeSG
+    Data.IntMap.Internal:               25894
+    Data.Map.Internal:                  2348
+
+ghc-prim
+    GHC.CString:                        2268
+    GHC.Classes:                        451
+    GHC.IntWord64:                      1747
+    GHC.Tuple:                          125
+    GHC.Types:                          17819
+
+ghcjs-base-0.2.0.0-e382e3a14d1a9370cb61b6ae06b235f541f0c13c5e79b6f3de4b124166137e6a
+    GHCJS.Marshal:                      222
+    GHCJS.Marshal.Internal:             358
+    GHCJS.Marshal.Pure:                 539
+
+ghcjs-dom-jsffi-0.9.4.0-55b1cddef78a2eab77fbba45194ec9cbae7dae2f2dfaa86009772734e886bc17
+    GHCJS.DOM:                          2095
+    GHCJS.DOM.EventM:                   573
+    GHCJS.DOM.EventTargetClosures:      1172
+    GHCJS.DOM.JSFFI.Generated.Document: 1434
+    GHCJS.DOM.JSFFI.Generated.GlobalEventHandlers:1296
+    GHCJS.DOM.JSFFI.Generated.NonElementParentNode:4400
+    GHCJS.DOM.Types:                    226
+
+ghcjs-prim-0.1.1.0-EXzjGVHQlAS2XAXcu0iCbS
+    GHCJS.Prim:                         2473
+    GHCJS.Prim.Internal:                1801
+
+integer-gmp
+    GHC.Integer.Logarithms.Internals:   66610
+    GHC.Integer.Type:                   2744
+
+keycode-0.2.2-730cdc84e7e48c19d859dd2c1cef53ada1dd03e8ce92a22b4bee9dd14625c3bc
+    Web.KeyCode:                        19515
+
+main
+    Game:                               8355
+    Main:                               754
+    Point:                              3793
+
+random-1.1-8d96efdfc0e58ac1d08980258ced60eaa3e93d2f0c73bca715b218ab77b0fe38
+    System.Random:                      37585
+
+shine-0.2.0.3-inplace
+    Graphics.Shine:                     1
+    Graphics.Shine.Input:               1
+    Graphics.Shine.Picture:             19218
+    Graphics.Shine.Render:              952
+
+time-1.8.0.2-3d3i5aGvKEfEHwUSNgliL4
+    Data.Time.Clock.Internal.CTimespec: 1
+    Data.Time.Clock.Internal.NominalDiffTime:1
+    Data.Time.Clock.Internal.UTCTime:   2018
+    Data.Time.Clock.POSIX:              1211
+    Data.Time.Clock.System:             43631
+
+
+
+packed metadata: 303786
+
