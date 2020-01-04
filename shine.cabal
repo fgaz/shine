@@ -1,5 +1,5 @@
 name: shine
-version: 0.2.0.3
+version: 0.2.0.4
 cabal-version: >=1.8
 build-type: Simple
 license: MIT
@@ -32,11 +32,11 @@ library
                      Graphics.Shine.Render
     build-depends: base >=4.11 && <4.13,
                    ghcjs-dom >=0.9 && <0.10,
-                   ghcjs-prim,
+                   ghcjs-prim >=0.1 && <0.2,
                    keycode >=0.2 && <0.3,
-                   time,
-                   mtl,
-                   transformers
+                   time >=1.8 && <1.10,
+                   mtl >=2.2 && <2.3,
+                   transformers >=0.5 && <0.6
     hs-source-dirs: src
     ghc-options: -O2 -Wall
 
