@@ -1,14 +1,14 @@
 code size summary per package:
 
 base:                    352103
-ghc-prim:                19266
+ghc-prim:                19243
 ghcjs-base-0.2.0.0-e382e3a14d1a9370cb61b6ae06b235f541f0c13c5e79b6f3de4b124166137e6a:1118
 ghcjs-dom-jsffi-0.9.4.0-55b1cddef78a2eab77fbba45194ec9cbae7dae2f2dfaa86009772734e886bc17:23677
 ghcjs-prim-0.1.1.0-EXzjGVHQlAS2XAXcu0iCbS:4340
 integer-gmp:             61891
 main:                    3930
 shine-0.2.0.3-inplace:   21897
-time-1.8.0.2-3d3i5aGvKEfEHwUSNgliL4:9658
+time-1.8.0.2-3d3i5aGvKEfEHwUSNgliL4:9740
 
 
 code size per module:
@@ -30,7 +30,7 @@ base
     GHC.Exception:                      2634
     GHC.Exception.Type:                 5739
     GHC.Fingerprint:                    546
-    GHC.Fingerprint.Type:               69101
+    GHC.Fingerprint.Type:               69100
     GHC.Float:                          219
     GHC.Float.RealFracMethods:          11091
     GHC.Foreign:                        584
@@ -42,7 +42,7 @@ base
     GHC.IO.Encoding:                    592
     GHC.IO.Encoding.Failure:            1
     GHC.IO.Encoding.Types:              58272
-    GHC.IO.Encoding.UTF8:               11258
+    GHC.IO.Encoding.UTF8:               11259
     GHC.IO.Exception:                   26591
     GHC.IO.FD:                          274
     GHC.IO.Handle:                      5123
@@ -68,7 +68,7 @@ ghc-prim
     GHC.Classes:                        451
     GHC.IntWord64:                      1747
     GHC.Tuple:                          125
-    GHC.Types:                          15843
+    GHC.Types:                          15820
 
 ghcjs-base-0.2.0.0-e382e3a14d1a9370cb61b6ae06b235f541f0c13c5e79b6f3de4b124166137e6a
     GHCJS.Marshal:                      222
@@ -103,9 +103,9 @@ time-1.8.0.2-3d3i5aGvKEfEHwUSNgliL4
     Data.Time.Clock.Internal.NominalDiffTime:1
     Data.Time.Clock.Internal.UTCTime:   2226
     Data.Time.Clock.POSIX:              1564
-    Data.Time.Clock.System:             5670
+    Data.Time.Clock.System:             5752
 
 
 
-packed metadata: 177066
+packed metadata: 177041
 
