@@ -6,7 +6,7 @@ Shine wraps javascript's drawing functions in a declarative API.
 
 Heavily inspired by [gloss](http://gloss.ouroborus.net/).
 
-**demo** (compiled tests) [here](http://fgaz.github.io/shine/tests)
+**demo** (compiled shine-examples) [here](http://fgaz.github.io/shine/shine-examples)
 
 ## Compiling
 
@@ -134,4 +134,9 @@ main = do
     handleInput _ = id -- catch-all for all other events
     step _ = id -- our state does not depend on time
 ```
+
+### Examples
+
+See the [`shine-examples`](./shine-examples) package
+([Hackage](https://hackage.haskell.org/package/shine-examples)).
 
