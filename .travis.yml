@@ -7,10 +7,10 @@ matrix:
     - addons: {apt: {packages: [curl,git]}}
 
 install:
- - echo "trusted-users = $USER" | sudo tee -a /etc/nix/nix.conf
- - sudo systemctl restart nix-daemon
  - git clone https://github.com/reflex-frp/reflex-platform
  - echo "" | ./reflex-platform/scripts/setup
+ - echo "trusted-users = $USER" | sudo tee -a /etc/nix/nix.conf
+ - sudo systemctl restart nix-daemon
  - ./reflex-platform/scripts/work-on ghcjs ./. --run "cabal new-update && echo Prepared environment"
 
 script:
